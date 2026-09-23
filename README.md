@@ -1,31 +1,74 @@
-# Your Project Name
+# WAKE Protocol
 
-> **Replace this whole file.** It is a worked example of the README your project
-> will be graded from, not a file to leave as it is. Start with
+> WAKE Protocol is a responsive alarm web application designed for students and people who have difficulty waking up, requiring users to complete a challenge before dismissing an alarm.
 > [START-HERE.md](START-HERE.md).
 
 One sentence saying what this does and who it is for.
 
-**Live site:** https://yourusername.github.io/your-repo-name/
-**API:** https://your-api.onrender.com/healthz
-**Demo video:** (link)
+**Live site:** Not deployed yet
+**API:** Not available yet
+**Demo video:** Not available yet
 
-> **This deployment is running in demo mode.** The interface is real; the backend
+>Current development status: This Week 1 increment focuses on the React/Vite frontend and the core WAKE Protocol interface. Backend, database, and full alarm functionality are planned for subsequent development.
+
+<!-- > **This deployment is running in demo mode.** The interface is real; the backend
 > is simulated in your browser so the site works without a server. See
-> [Demo mode](#demo-mode) below. Delete this quote once your API is live.
+> [Demo mode](#demo-mode) below. Delete this quote once your API is live. -->
 
 ![A screenshot of the main screen](docs/assets/screenshot.png)
 
 ## What it does
 
-- Report a sighting with a place, a description and a spookiness rating
-- Browse everything reported, newest first
-- Delete a report
+# WAKE Protocol
+
+WAKE Protocol is a responsive alarm web application designed for students and people who have difficulty waking up, requiring users to complete a challenge before dismissing an alarm.
+
+**Live site:** Not deployed yet  
+**API:** Not available yet  
+**Demo video:** Not available yet
+
+> **Current development status:** This Week 1 increment focuses on the React/Vite frontend and the core WAKE Protocol interface. Backend, database, and full alarm functionality are planned for subsequent development.
+
+## What it does
+
+  WAKE Protocol provides a structured alarm experience with:
+
+  - Home dashboard showing upcoming alarm information and wake-up statistics
+  - Multiple alarm management
+  - Enable and disable alarms
+  - Alarm filtering by category and status
+  - Create and edit alarm configurations
+  - Custom alarm names
+  - Repeat-day selection
+  - Local audio file selection for alarm music
+  - Math disarm missions
+  - Typing disarm missions
+  - Active Alarm screen for completing the required challenge
+  - Responsive interface for desktop and mobile-sized screens
+
+  ## Disarm Missions
+
+  Each alarm can require one of two challenge types:
+
+  ### Math Mission
+
+  The user must solve the displayed mathematical equation before the alarm can be dismissed.
+
+  ### Typing Mission
+
+  The user must correctly type the displayed phrase before the alarm can be dismissed.
+
+  Full challenge validation and alarm triggering will be implemented in a later increment.
 
 ## Built with
 
-React and Vite on the front end, Express and PostgreSQL on the back end. The
-client is on GitHub Pages, the API on (host), the database on (host).
+- React 18
+- Vite 6
+- JavaScript
+- CSS
+- HTML
+
+The current increment is focused on the frontend interface. The project repository also contains the template structure for the Express and PostgreSQL backend that will be developed in later increments.
 
 ## Demo mode
 
@@ -129,27 +172,58 @@ set the environment variables in its dashboard, and run `server/db/schema.sql`
 once against the hosted database.
 
 ## Project structure
-
-    client/          React front end, built by Vite
-      src/api/       ONE interface, two implementations, chosen by a variable
-      src/components/
-    server/          Express API
-      db/            pool, schema.sql, seed.sql, and a runner for them
-    compose.yml      only if you self-host
-    docs/            your planning documents and weekly reports
+WAKE_PROTOCOL/
+│
+├── .github/
+│   └── workflows/
+│
+├── client/
+│   ├── src/
+│   │   ├── components/
+│   │   │   └── BottomNav.jsx
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── Home.jsx
+│   │   │   ├── ManageAlarms.jsx
+│   │   │   ├── AlarmForm.jsx
+│   │   │   └── ActiveAlarm.jsx
+│   │   │
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── styles.css
+│   │
+│   └── package.json
+│
+├── server/
+│
+├── docs/
+│
+├── .env.example
+├── .gitignore
+├── AI-USAGE.md
+├── LICENSE
+├── README.md
+├── START-HERE.md
+└── compose.yml
 
 ## Architecture
 
-Three or four sentences, or a small diagram. Which piece talks to which, and
-where each one is hosted.
+The current increment consists primarily of a React/Vite client. React components are used to render the Home, Manage Alarms, Alarm Configuration, and Active Alarm screens, while CSS provides the responsive visual design.
+
+The project is structured to support a future Express API and PostgreSQL database. Backend integration will be added in later development increments so alarm data can be persisted and the complete application can operate as a full-stack system.
 
 ## What I would do next
 
-Three honest bullets. This paragraph is worth more than it looks.
+- Connect alarm creation, editing, deletion, and status changes to persistent application data.
+- Implement the Express API and PostgreSQL database for the full-stack application.
+- Implement real alarm scheduling, audio playback, and Math/Typing challenge validation.
 
 ## Author
 
-Your name, and a link. Course and section.
+Kkshitij Kumaarr
+(link)
+CS-401 — 6APSI
+Final Project: WAKE Protocol
 
 ## Licence
 
