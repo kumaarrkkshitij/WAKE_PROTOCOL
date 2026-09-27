@@ -585,6 +585,14 @@ button {
   font-size: 9px;
 }
 
+.manage-alarm-name {
+  margin-top: 6px;
+  margin-bottom: 4px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .alarm-days {
   margin-top: 3px;
   color: var(--muted);
@@ -1653,3 +1661,4 @@ button {
   background: var(--primary);
   color: #002026;
 }
+

@@ -1,31 +1,25 @@
-import { useState } from 'react'
-
-const initialAlarms = [
-  {
-    id: 1,
-    time: '06:30',
-    period: 'AM',
-    days: 'Mon, Tue, Wed, Thu, Fri',
-    category: 'workdays',
-    enabled: true,
-    challenge: 'Math Mission (3 problems • Hard)',
-    music: 'Apex Pulse',
-  },
-  {
-    id: 2,
-    time: '07:15',
-    period: 'AM',
-    days: 'Sat, Sun',
-    category: 'weekend',
-    enabled: false,
-    challenge: 'Typing Mission',
-    music: 'Neon Horizon',
-  },
-]
+import { useEffect, useState } from 'react'
 
 export default function ManageAlarms({ onCreate, onEdit }) {
-  const [alarms, setAlarms] = useState(initialAlarms)
+  const [alarms, setAlarms] = useState([])
   const [filter, setFilter] = useState('all')
+
+  useEffect(() => {
+    fetch('http://localhost:3000/api/alarms')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to load alarms')
+        }
+  
+        return response.json()
+      })
+      .then((data) => {
+        setAlarms(data)
+      })
+      .catch((error) => {
+        console.error('Failed to load alarms:', error)
+      })
+  }, [])
 
   const toggleAlarm = (id) => {
     setAlarms(
@@ -123,6 +117,10 @@ export default function ManageAlarms({ onCreate, onEdit }) {
                     <div className="manage-alarm-time">
                       {alarm.time}
                       <span>{alarm.period}</span>
+                    </div>
+
+                    <div className="manage-alarm-name">
+                      {alarm.name}
                     </div>
 
                     <div className="alarm-days">

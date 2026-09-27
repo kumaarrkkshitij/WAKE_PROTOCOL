@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import { pool } from './db/pool.js'
-import * as sightings from './sightingsRepo.js'
+import * as alarms from './alarmsRepo.js'
 
 const app = express()
 
@@ -36,77 +36,132 @@ app.get('/readyz', async (request, response) => {
   }
 })
 
+app.get('/api/alarms', async (request, response, next) => {
+  try {
+    response.json(await alarms.getAll(pool))
+  } catch (error) {
+    next(error)
+  }
+})
+
+app.get('/api/alarms/:id', async (request, response, next) => {
+  try {
+    const alarm = await alarms.getById(pool, request.params.id)
+
+    if (!alarm) {
+      return response.status(404).json({ error: 'Not found' })
+    }
+
+    response.json(alarm)
+  } catch (error) {
+    next(error)
+  }
+})
+
 // Validation lives on the server because the client can be bypassed. The
 // browser form is for a fast, friendly message; this is for correctness.
 function validate(body) {
   const errors = []
-  const place = typeof body.place === 'string' ? body.place.trim() : ''
-  const description =
-    typeof body.description === 'string' ? body.description.trim() : ''
-  const spookiness = Number(body.spookiness)
 
-  if (!place) errors.push('place is required')
-  if (place.length > 120) errors.push('place must be 120 characters or fewer')
-  if (description.length > 2000) errors.push('description must be 2000 characters or fewer')
-  if (!Number.isInteger(spookiness) || spookiness < 1 || spookiness > 5) {
-    errors.push('spookiness must be a whole number from 1 to 5')
+  const time = typeof body.time === 'string' ? body.time.trim() : ''
+  const period = typeof body.period === 'string' ? body.period.trim() : ''
+  const name = typeof body.name === 'string' ? body.name.trim() : ''
+  const repeat_days = Array.isArray(body.repeat_days)
+    ? body.repeat_days
+    : []
+  const challenge_type =
+    typeof body.challenge_type === 'string'
+      ? body.challenge_type.trim()
+      : ''
+  const music = typeof body.music === 'string' ? body.music.trim() : ''
+  const enabled =
+    typeof body.enabled === 'boolean' ? body.enabled : true
+
+  if (!time) errors.push('time is required')
+  if (!/^\d{2}:\d{2}$/.test(time)) {
+    errors.push('time must use HH:MM format')
   }
 
-  return { errors, value: { place, description, spookiness } }
+  if (!['AM', 'PM'].includes(period)) {
+    errors.push('period must be AM or PM')
+  }
+
+  if (!name) errors.push('name is required')
+  if (name.length > 120) {
+    errors.push('name must be 120 characters or fewer')
+  }
+
+  if (!['Math', 'Typing'].includes(challenge_type)) {
+    errors.push('challenge_type must be Math or Typing')
+  }
+
+  return {
+    errors,
+    value: {
+      time,
+      period,
+      name,
+      repeat_days,
+      challenge_type,
+      music,
+      enabled,
+    },
+  }
 }
-
-app.get('/api/sightings', async (request, response, next) => {
-  try {
-    response.json(await sightings.getAll(pool))
-  } catch (error) {
-    next(error)
-  }
-})
-
-app.get('/api/sightings/:id', async (request, response, next) => {
-  try {
-    const row = await sightings.getById(pool, request.params.id)
-    if (!row) return response.status(404).json({ error: 'Not found' })
-    response.json(row)
-  } catch (error) {
-    next(error)
-  }
-})
-
-app.post('/api/sightings', async (request, response, next) => {
+app.post('/api/alarms', async (request, response, next) => {
   const { errors, value } = validate(request.body ?? {})
-  if (errors.length > 0) return response.status(400).json({ error: errors.join('; ') })
+
+  if (errors.length > 0) {
+    return response.status(400).json({
+      error: errors.join('; '),
+    })
+  }
 
   try {
-    response.status(201).json(await sightings.create(pool, value))
+    const alarm = await alarms.create(pool, value)
+    response.status(201).json(alarm)
   } catch (error) {
     next(error)
   }
 })
 
-app.put('/api/sightings/:id', async (request, response, next) => {
+app.put('/api/alarms/:id', async (request, response, next) => {
   const { errors, value } = validate(request.body ?? {})
-  if (errors.length > 0) return response.status(400).json({ error: errors.join('; ') })
+
+  if (errors.length > 0) {
+    return response.status(400).json({
+      error: errors.join('; '),
+    })
+  }
 
   try {
-    const row = await sightings.update(pool, request.params.id, value)
-    if (!row) return response.status(404).json({ error: 'Not found' })
-    response.json(row)
+    const alarm = await alarms.update(pool, request.params.id, value)
+
+    if (!alarm) {
+      return response.status(404).json({ error: 'Not found' })
+    }
+
+    response.json(alarm)
   } catch (error) {
     next(error)
   }
 })
 
-app.delete('/api/sightings/:id', async (request, response, next) => {
+app.delete('/api/alarms/:id', async (request, response, next) => {
   try {
-    const removed = await sightings.remove(pool, request.params.id)
-    if (!removed) return response.status(404).json({ error: 'Not found' })
+    const removed = await alarms.remove(pool, request.params.id)
+
+    if (!removed) {
+      return response.status(404).json({ error: 'Not found' })
+    }
+
     response.status(204).end()
   } catch (error) {
     next(error)
   }
 })
 
+// 404 handler comes after the routes
 app.use((request, response) => {
   response.status(404).json({ error: 'No such route' })
 })

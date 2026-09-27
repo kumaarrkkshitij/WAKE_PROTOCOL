@@ -7,8 +7,10 @@ import BottomNav from './components/BottomNav'
 import './styles.css'
 
 export default function App() {
-  const [page, setPage] = useState('active-math')
+  //const [page, setPage] = useState('active-math')
+  const [page, setPage] = useState('home')
   const [activeChallenge, setActiveChallenge] = useState('Math')
+  const [editingAlarm, setEditingAlarm] = useState(null)
 
   const handleNavigate = (nextPage) => {
     setPage(nextPage)

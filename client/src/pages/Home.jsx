@@ -113,18 +113,6 @@ export default function Home() {
                   ☾
                 </div>
               </div>
-  
-              <div className="sleep-details">
-                <div>
-                  <span>DISARM TEST</span>
-                  <strong>Verified (Math 3x)</strong>
-                </div>
-  
-                <div>
-                  <span>ACOUSTIC GAIN</span>
-                  <strong>98dB Max</strong>
-                </div>
-              </div>
             </section>
   
           </div>

@@ -6,15 +6,18 @@
 -- rather than by connecting to a server. It is also what lets you move to a
 -- hosted database in one command.
 
-CREATE TABLE IF NOT EXISTS sightings (
-  id          SERIAL PRIMARY KEY,
-  place       TEXT        NOT NULL,
-  description TEXT        NOT NULL DEFAULT '',
-  spookiness  INTEGER     NOT NULL CHECK (spookiness BETWEEN 1 AND 5),
-  reported_at TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE IF NOT EXISTS alarms (
+  id             SERIAL PRIMARY KEY,
+  time           TEXT        NOT NULL,
+  period         TEXT        NOT NULL CHECK (period IN ('AM', 'PM')),
+  name           TEXT        NOT NULL,
+  repeat_days    TEXT[]      NOT NULL DEFAULT '{}',
+  challenge_type TEXT        NOT NULL CHECK (challenge_type IN ('Math', 'Typing')),
+  music          TEXT        NOT NULL DEFAULT '',
+  enabled        BOOLEAN     NOT NULL DEFAULT TRUE,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- The list page always sorts newest first. Without this the database reads
--- every row and sorts it on each request.
-CREATE INDEX IF NOT EXISTS sightings_reported_at_idx
-  ON sightings (reported_at DESC);
+-- Helps queries that filter alarms by their enabled/disabled state.
+CREATE INDEX IF NOT EXISTS alarms_enabled_idx
+  ON alarms (enabled);
