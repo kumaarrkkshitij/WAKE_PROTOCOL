@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 export default function ManageAlarms({ onCreate, onEdit }) {
   const [alarms, setAlarms] = useState([])
   const [filter, setFilter] = useState('all')
+  const [currentTime, setCurrentTime] = useState(new Date())
 
   useEffect(() => {
     fetch('http://localhost:3000/api/alarms')
@@ -14,21 +15,76 @@ export default function ManageAlarms({ onCreate, onEdit }) {
         return response.json()
       })
       .then((data) => {
-        setAlarms(data)
+        const mappedAlarms = data.map((alarm) => ({
+          ...alarm,
+          days: alarm.repeat_days?.join(', ') || '',
+          challenge: alarm.challenge_type,
+        }))
+      
+        setAlarms(mappedAlarms)
       })
+
       .catch((error) => {
         console.error('Failed to load alarms:', error)
       })
   }, [])
 
-  const toggleAlarm = (id) => {
-    setAlarms(
-      alarms.map((alarm) =>
-        alarm.id === id
-          ? { ...alarm, enabled: !alarm.enabled }
-          : alarm
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [])
+
+  const toggleAlarm = async (id) => {
+    const alarm = alarms.find((item) => item.id === id)
+  
+    if (!alarm) return
+  
+    const updatedEnabled = !alarm.enabled
+  
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/alarms/${id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            time: alarm.time,
+            period: alarm.period,
+            name: alarm.name,
+            repeat_days: alarm.repeat_days || [],
+            challenge_type: alarm.challenge_type,
+            music: alarm.music || '',
+            enabled: updatedEnabled,
+          }),
+        }
       )
-    )
+  
+      if (!response.ok) {
+        throw new Error('Failed to update alarm')
+      }
+  
+      const updatedAlarm = await response.json()
+  
+      setAlarms((currentAlarms) =>
+        currentAlarms.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                ...updatedAlarm,
+                days: updatedAlarm.repeat_days?.join(', ') || '',
+                challenge: updatedAlarm.challenge_type,
+              }
+            : item
+        )
+      )
+    } catch (error) {
+      console.error('Failed to toggle alarm:', error)
+    }
   }
 
   const deleteAlarm = (id) => {
@@ -37,8 +93,46 @@ export default function ManageAlarms({ onCreate, onEdit }) {
 
   const filteredAlarms = alarms.filter((alarm) => {
     if (filter === 'all') return true
-    if (filter === 'inactive') return !alarm.enabled
-    return alarm.category === filter
+  
+    if (filter === 'inactive') {
+      return !alarm.enabled
+    }
+  
+    if (filter === 'workdays') {
+      const workdays = ['M', 'T', 'W', 'TH', 'F']
+  
+      return workdays.some((day) =>
+        alarm.repeat_days?.includes(day)
+      )
+    }
+  
+    if (filter === 'weekend') {
+      const weekend = ['SA', 'SU']
+  
+      return weekend.some((day) =>
+        alarm.repeat_days?.includes(day)
+      )
+    }
+  
+    return true
+  })
+
+  const sortedAlarms = [...filteredAlarms].sort((a, b) => {
+    const toMinutes = (alarm) => {
+      const [hours, minutes] = alarm.time.split(':').map(Number)
+  
+      let hour24 = hours
+  
+      if (alarm.period === 'AM') {
+        hour24 = hours === 12 ? 0 : hours
+      } else {
+        hour24 = hours === 12 ? 12 : hours + 12
+      }
+  
+      return hour24 * 60 + minutes
+    }
+  
+    return toMinutes(a) - toMinutes(b)
   })
 
   return (
@@ -58,8 +152,21 @@ export default function ManageAlarms({ onCreate, onEdit }) {
         </div>
 
         <div className="live-time">
-          <span>10:42</span>
-          <small>PM</small>
+          <span>
+            {currentTime.toLocaleTimeString([], {
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true,
+            }).split(' ')[0]}
+          </span>
+
+          <small>
+            {currentTime.toLocaleTimeString([], {
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true,
+            }).split(' ')[1]}
+          </small>
         </div>
       </header>
 
@@ -105,7 +212,7 @@ export default function ManageAlarms({ onCreate, onEdit }) {
 
           {/* Alarm List */}
           <div className="manage-alarm-list">
-            {filteredAlarms.map((alarm) => (
+            {sortedAlarms.map((alarm) => (
               <section
                 className={`manage-alarm-card ${
                   !alarm.enabled ? 'inactive' : ''

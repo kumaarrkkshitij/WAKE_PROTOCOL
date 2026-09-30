@@ -168,6 +168,7 @@ button {
 .live-time small {
   color: var(--primary);
   font-size: 9px;
+  text-transform: uppercase;
 }
 
 /* MAIN */

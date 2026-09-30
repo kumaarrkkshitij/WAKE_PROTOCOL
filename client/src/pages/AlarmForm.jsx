@@ -17,7 +17,7 @@ export default function AlarmForm({ mode = 'create', alarm = null, onCancel, onS
     alarm?.name || 'Work Morning Power Wake'
   )
   const [repeatDays, setRepeatDays] = useState(
-    alarm?.repeatDays || ['M', 'T', 'W', 'TH', 'F']
+    alarm?.repeatDays || alarm?.repeat_days || ['M', 'T', 'W', 'TH', 'F']
   )
   const [challenge, setChallenge] = useState(
     alarm?.challengeType || 'Math'
@@ -40,16 +40,60 @@ export default function AlarmForm({ mode = 'create', alarm = null, onCancel, onS
     }
   }
 
-  const handleSave = () => {
-    onSave({
-      ...alarm,
-      time,
-      period,
-      name,
-      repeatDays,
-      challengeType: challenge,
-      music,
-    })
+  const handleSave = async () => {
+    try {
+      const alarmData = {
+        time,
+        period,
+        name,
+        repeat_days: repeatDays,
+        challenge_type: challenge,
+        music,
+        enabled: alarm?.enabled ?? true,
+      }
+  
+      if (mode === 'create') {
+        const response = await fetch('http://localhost:3000/api/alarms', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(alarmData),
+        })
+  
+        if (!response.ok) {
+          throw new Error('Failed to create alarm')
+        }
+  
+        const savedAlarm = await response.json()
+  
+        console.log('Alarm created:', savedAlarm)
+        onSave(savedAlarm)
+        return
+      }
+  
+      const response = await fetch(
+        `http://localhost:3000/api/alarms/${alarm.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(alarmData),
+        }
+      )
+  
+      if (!response.ok) {
+        throw new Error('Failed to update alarm')
+      }
+  
+      const updatedAlarm = await response.json()
+  
+      console.log('Alarm updated:', updatedAlarm)
+      onSave(updatedAlarm)
+    } catch (error) {
+      console.error('Failed to save alarm:', error)
+    }
   }
 
   return (
