@@ -73,7 +73,7 @@ At least six entries. One per real use. Every entry needs a commit link.
 * **What I asked for:** I asked AI for help understanding how the selected alarm should be passed from Manage Alarms to the Edit Alarm screen.
 * **What it gave back:** AI explained how React state and functions could be used to store the selected alarm and change the current page to the edit screen.
 * **What I kept, what I changed, and why:** I worked with the edit-alarm connection in `App.jsx`. I used the `editingAlarm` state to store the alarm selected from Manage Alarms, and the edit action sets that alarm before navigating to the Edit Alarm screen. The selected alarm is then passed to `AlarmForm` through the `alarm` prop. I kept this approach because it is a simple way to carry the selected alarm between screens without introducing another routing system.
-* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/5266abe083b21adfb9333efc03453d4a2d6d5503
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/dd12f2b013da0b48f3c4489b0b65e5f63d00ab1b
 
 ## 2. Where the AI got it wrong
 
@@ -92,14 +92,14 @@ scores zero.
 * **What it gave me:** AI helped implement the `AlarmForm` component as a shared screen for both creating a new alarm and editing an existing alarm.
 * **What was wrong with it:** The initial implementation did not handle the two entry points correctly. The Create Alarm action could reach the `AlarmForm` correctly, but the Edit Alarm action was also being routed incorrectly instead of opening the form with the selected alarm's information.
 * **What I did instead:** I traced how the selected alarm was being passed from `ManageAlarms.jsx` into `App.jsx` and then into `AlarmForm.jsx`. I identified the problem in the page/state handling and modified the `editingAlarm` state and the edit navigation logic in `App.jsx` so that the selected alarm is stored before navigating to the edit screen. I then passed the selected alarm to `AlarmForm` through the `alarm` prop. This allowed the same `AlarmForm` component to correctly handle both Create and Edit modes.
-* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/5266abe083b21adfb9333efc03453d4a2d6d5503
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/dd12f2b013da0b48f3c4489b0b65e5f63d00ab1b
 
 ### Case 3 - Alarm Name Missing From Alarm Cards
 
 * **What it gave me:** During the UI implementation, AI created the alarm name field and included the alarm name in the Create/Edit Alarm form.
 * **What was wrong with it:** The alarm name was only being reflected in the Create/Edit Alarm screen. The alarm cards displayed on both the Home page and Manage Alarms page did not properly show the alarm name, even though the alarm name variable already existed when creating an alarm.
 * **What I did instead:** I noticed that the alarm name was missing from the actual alarm cards and manually fixed the UI. I modified `ManageAlarms.jsx` and the related CSS so the alarm name was included in the alarm card display. I also checked the alarm card structure so the name appeared in the correct place instead of only existing as a field inside the Create/Edit form. This made the alarm name visible where users actually view their alarms.
-* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/5266abe083b21adfb9333efc03453d4a2d6d5503
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/dd12f2b013da0b48f3c4489b0b65e5f63d00ab1b
 
 ## 3. Who wrote what
 
@@ -144,7 +144,7 @@ it in your own words.
 #### Alarm Name and Create/Edit Form
 
 * **File:** `client/src/pages/AlarmForm.jsx`
-* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/5266abe083b21adfb9333efc03453d4a2d6d5503
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/dd12f2b013da0b48f3c4489b0b65e5f63d00ab1b
 * **What it does and why it is built this way:** I worked on the alarm name part of the Create/Edit Alarm form because the alarm needed a name that could be entered and carried with the rest of the alarm information. I worked with the name state and the form field so the entered alarm name became part of the alarm data. The same `AlarmForm` component is used for both creating and editing alarms, so keeping the alarm name in the shared form allows both operations to use the same field.
 
 #### Manage Alarms API Connection and UI Changes
@@ -156,7 +156,7 @@ it in your own words.
 #### Edit Alarm State
 
 * **File:** `client/src/App.jsx`
-* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/5266abe083b21adfb9333efc03453d4a2d6d5503
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/dd12f2b013da0b48f3c4489b0b65e5f63d00ab1b
 * **What it does and why it is built this way:** I worked on the `editingAlarm` state used when an existing alarm is selected for editing. The selected alarm is stored before navigating to the Edit Alarm screen, and then it is passed to `AlarmForm` through the `alarm` prop. I worked on this because the same `AlarmForm` component is used for both creating and editing an alarm, so the edit version needs to receive the selected alarm's existing data.
 
 #### Partial Express API Changes
@@ -176,7 +176,7 @@ it in your own words.
 #### React Alarm Form State
 
 * **File:** `client/src/pages/AlarmForm.jsx`
-* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/5266abe083b21adfb9333efc03453d4a2d6d5503
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/dd12f2b013da0b48f3c4489b0b65e5f63d00ab1b
 * **What it does and why we kept it:** I understand how the form uses React state to keep track of values such as time, period, repeat days, challenge type, and music while the user edits the form. The form controls update the corresponding state, and the saved values are then collected when the form is submitted. We kept the shared form approach because the same component can handle both Create and Edit modes instead of having two separate forms.
 
 #### PostgreSQL Setup and Database Connection
