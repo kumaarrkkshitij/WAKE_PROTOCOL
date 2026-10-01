@@ -75,6 +75,54 @@ At least six entries. One per real use. Every entry needs a commit link.
 * **What I kept, what I changed, and why:** I worked with the edit-alarm connection in `App.jsx`. I used the `editingAlarm` state to store the alarm selected from Manage Alarms, and the edit action sets that alarm before navigating to the Edit Alarm screen. The selected alarm is then passed to `AlarmForm` through the `alarm` prop. I kept this approach because it is a simple way to carry the selected alarm between screens without introducing another routing system.
 * **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/dd12f2b013da0b48f3c4489b0b65e5f63d00ab1b
 
+### 2026-09-30 - Alarm Backend Integration
+
+* **Tool:** ChatGPT
+* **What I asked for:** I asked AI how to connect the Create Alarm and Edit Alarm forms to the existing Express alarm API and PostgreSQL database.
+* **What it gave back:** AI provided guidance for sending alarm data from `AlarmForm.jsx` to the backend using POST for new alarms and PUT for existing alarms. It also explained how the frontend field names needed to match the database/API field names.
+* **What I kept, what I changed, and why:** I used the suggested API integration approach and adapted it to the existing WAKE Protocol form. I kept the field mapping between the frontend and backend, including `repeatDays` to `repeat_days` and `challenge` to `challenge_type`. I also kept the existing enabled state when editing an alarm and fixed the repeat-day state so previously selected days were loaded correctly when editing. The approach was kept because it allowed Create and Edit Alarm to use the existing backend instead of keeping the data only in frontend state.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+
+### 2026-09-30 - Alarm Data Retrieval
+
+* **Tool:** ChatGPT
+* **What I asked for:** I asked AI how to change the Manage Alarms page so it would retrieve real alarm data from the Express API instead of using sample frontend data.
+* **What it gave back:** AI provided guidance for fetching `/api/alarms`, storing the returned data in React state, and mapping the database field names to the properties used by the existing interface.
+* **What I kept, what I changed, and why:** I connected the Manage Alarms screen to the real API and adapted the returned alarm data to the existing alarm-card structure. I tested the page with an empty database to confirm that it correctly displayed no alarms when the backend returned an empty list. I kept the existing card layout and visual design where it continued to work with the database data.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+
+### 2026-09-30 - Persistent Alarm Toggle
+
+* **Tool:** ChatGPT
+* **What I asked for:** I asked AI how to make the alarm enable/disable toggle save its changes to the backend instead of only changing the React state.
+* **What it gave back:** AI explained how the selected alarm could be found by ID, how its `enabled` value could be reversed, and how the complete alarm data could be sent back through the existing PUT API.
+* **What I kept, what I changed, and why:** I used the existing alarm update endpoint and adapted the toggle so the changed enabled state is sent to PostgreSQL. After the API responds, the returned alarm data is used to update the frontend state. I kept this approach because the toggle now remains consistent with the database instead of reverting after a refresh.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+
+### 2026-09-30 - Alarm Filtering and Sorting
+
+* **Tool:** ChatGPT
+* **What I asked for:** I asked AI for help making the Manage Alarms filters work with the new `repeat_days` database field and for help sorting alarm times correctly.
+* **What it gave back:** AI provided logic for checking whether an alarm contains weekday or weekend repeat days and for converting AM/PM alarm times into comparable 24-hour minute values.
+* **What I kept, what I changed, and why:** I adapted the filtering logic so Workdays checks Monday through Friday and Weekend checks Saturday and Sunday. I also used chronological sorting after filtering so the alarm cards appear from the earliest time to the latest time. I kept the filtering and sorting as frontend operations because they are based on the alarm data already retrieved by the page and do not require additional database queries.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+
+### 2026-09-30 - Dynamic Next Alarm
+
+* **Tool:** ChatGPT
+* **What I asked for:** I asked AI how to replace the hardcoded next-alarm information on the Home page with the actual upcoming alarm from the database.
+* **What it gave back:** AI provided guidance for retrieving the alarms, checking their enabled state, comparing the alarm time with the current local time, and considering the selected repeat days.
+* **What I kept, what I changed, and why:** I adapted the logic so the Home page finds the earliest enabled upcoming alarm based on the browser's local day and time. Disabled alarms are ignored, and the page displays a no-active-alarms state when there is no upcoming enabled alarm. I kept this approach because the Home page now reflects the actual saved alarm data instead of displaying placeholder information.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+
+### 2026-09-30 - Live Local Clock
+
+* **Tool:** ChatGPT
+* **What I asked for:** I asked AI how to replace the hardcoded time displayed on the Home and Manage Alarms screens with a live local clock.
+* **What it gave back:** AI provided a React state and interval-based approach that updates the displayed time every second using the browser's local time.
+* **What I kept, what I changed, and why:** I used the live clock approach on both Home and Manage Alarms. I adjusted the formatting after testing because the first version displayed the AM/PM indicator incorrectly. I changed the display so the time and AM/PM are separated and the AM/PM indicator appears once in uppercase. I kept the one-second update interval because it provides a continuously updated local clock without requiring a backend request.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+
 ## 2. Where the AI got it wrong
 
 Three cases. Be specific. If you write that the AI was never wrong, this section
@@ -100,6 +148,41 @@ scores zero.
 * **What was wrong with it:** The alarm name was only being reflected in the Create/Edit Alarm screen. The alarm cards displayed on both the Home page and Manage Alarms page did not properly show the alarm name, even though the alarm name variable already existed when creating an alarm.
 * **What I did instead:** I noticed that the alarm name was missing from the actual alarm cards and manually fixed the UI. I modified `ManageAlarms.jsx` and the related CSS so the alarm name was included in the alarm card display. I also checked the alarm card structure so the name appeared in the correct place instead of only existing as a field inside the Create/Edit form. This made the alarm name visible where users actually view their alarms.
 * **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/dd12f2b013da0b48f3c4489b0b65e5f63d00ab1b
+
+### Case 4 - Repeat Days Reset When Editing an Alarm
+
+- **What it gave me:** AI connected the saved alarm data to the Edit Alarm form and loaded the alarm information into the existing form.
+- **What was wrong with it:** When an existing alarm was opened for editing, the saved repeat days could be replaced by the default Monday–Friday selection instead of showing the days that were actually saved for that alarm.
+- **What I did instead:** I checked how the repeat-day value was being loaded into React state and found that the frontend and backend used different field names. I adjusted the initial state so it could use the existing frontend `repeatDays` value or the backend `repeat_days` value before falling back to the default days. I then tested the Edit Alarm screen again to confirm that the saved repeat days were preserved.
+- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+
+### Case 5 - Duplicate AM/PM Display
+
+- **What it gave me:** AI helped add a live local clock to the Home and Manage Alarms screens using the browser's current time.
+- **What was wrong with it:** The first clock formatting displayed the AM/PM indicator incorrectly, resulting in a duplicate period being shown in the interface.
+- **What I did instead:** I tested the clock in the browser and noticed that the time formatting was already returning the AM/PM value while the interface was also displaying one separately. I changed the formatting so the main time and the AM/PM indicator were handled separately, and then made the AM/PM display uppercase. I tested the result again to make sure the indicator appeared only once.
+- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+
+### Case 6 - Next Alarm Calculation Needed Adjustment
+
+- **What it gave me:** AI helped implement the logic for finding the next upcoming alarm from the alarms retrieved from PostgreSQL.
+- **What was wrong with it:** The initial logic needed additional adjustment to correctly account for the current local time, AM/PM conversion, repeat days, and whether an alarm had already passed for the current day. Simply retrieving the enabled alarms was not enough to determine which alarm should actually appear as the next alarm.
+- **What I did instead:** I worked through the time calculation and adjusted the logic to convert the alarm's AM/PM value into 24-hour minutes, compare it with the current local time, and check the upcoming repeat days. The resulting candidates are sorted by the amount of time until they occur, with disabled alarms ignored. I also added the no-active-alarms state when there is no valid upcoming alarm.
+- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+
+### Case 7 - Frontend Data Was Still Using Sample Alarm Information
+
+- **What it gave me:** AI initially built parts of the alarm interface around sample/frontend alarm data before the PostgreSQL integration was completed.
+- **What was wrong with it:** Once the backend was implemented, continuing to rely on sample alarm data would have meant that the interface was not displaying the actual alarms stored in the database.
+- **What I did instead:** I changed the Manage Alarms and Home screens to retrieve alarm data from the Express API using `GET /api/alarms`. The frontend then maps the backend fields into the format used by the React components. This allowed the displayed alarms and next-alarm information to come from the actual PostgreSQL data instead of temporary sample data.
+- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+
+### Case 8 - Backend and Frontend Field Names Did Not Match
+
+- **What it gave me:** AI helped connect the React alarm form and the PostgreSQL API.
+- **What was wrong with it:** The frontend and backend used different naming conventions for some fields. For example, the React form used `repeatDays` and `challenge`, while the API and database used `repeat_days` and `challenge_type`. Treating the fields as if they had identical names caused problems when transferring alarm data between the frontend and backend.
+- **What I did instead:** I explicitly mapped the frontend fields to the backend fields when sending and receiving alarm data. This allowed the React components to keep their existing naming while matching the field names expected by the Express API and PostgreSQL database.
+- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
 
 ## 3. Who wrote what
 
@@ -165,6 +248,31 @@ it in your own words.
 * **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/dd12f2b013da0b48f3c4489b0b65e5f63d00ab1b
 * **What it does and why it is built this way:** I adapted parts of the existing Express server for WAKE Protocol rather than writing the entire server from scratch. I changed the repository import from the starter `sightingsRepo.js` to `alarmsRepo.js`, added the alarm API routes, and changed the validation to match the alarm fields and the Math/Typing challenge types. I also tested the API endpoints with `curl`. The existing server structure and some of the surrounding code remained from the starter project and AI-assisted implementation.
 
+#### Alarm Backend Integration
+
+- **File:** `client/src/pages/AlarmForm.jsx`
+- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+- **What it does and why it is built this way:** I worked with the alarm save logic that connects the Create/Edit Alarm form to the backend. The form sends a `POST` request when creating an alarm and a `PUT` request when editing an existing alarm. I also worked with mapping the frontend fields such as `repeatDays` and `challenge` to the backend fields `repeat_days` and `challenge_type`. The enabled state is preserved when editing an alarm.
+
+#### Alarm Filtering
+
+- **File:** `client/src/pages/ManageAlarms.jsx`
+- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+- **What it does and why it is built this way:** I worked with the alarm filtering logic for All, Workdays, Weekend, and Inactive alarms. The Workdays filter checks for Monday through Friday, while the Weekend filter checks for Saturday and Sunday. The Inactive filter checks the alarm's `enabled` value. I kept the filtering logic simple so the displayed alarms can change without modifying the stored database data.
+
+#### Alarm Time Sorting
+
+- **File:** `client/src/pages/ManageAlarms.jsx`
+- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+- **What it does and why it is built this way:** I worked with the alarm sorting logic so alarms are displayed from earliest to latest. The code converts the stored AM/PM time into 24-hour minutes and compares the resulting values. This makes the alarm cards appear in chronological order instead of depending on the order returned by the database.
+
+#### Interface Styling Update
+
+- **File:** `client/src/styles.css`
+- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+- **What it does and why it is built this way:** I personally modified the CSS for the latest interface changes, including the live clock styling and its layout on the Home and Manage Alarms screens. I adjusted the styling so the current time and AM/PM indicator fit the existing WAKE Protocol visual design while remaining responsive on smaller screens.
+
+
 ### The AI-written part I understand best
 
 #### CSS and Responsive UI
@@ -190,3 +298,22 @@ it in your own words.
 * **Files:** `client/src/pages/ManageAlarms.jsx`, `server/server.js`, `server/alarmsRepo.js`
 * **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/dd12f2b013da0b48f3c4489b0b65e5f63d00ab1b
 * **What it does and why we kept it:** I understand the overall flow between the React frontend, Express API, repository layer, and PostgreSQL. `ManageAlarms.jsx` sends a request to `/api/alarms`. The Express route in `server.js` receives the request and calls the corresponding function in `alarmsRepo.js`. The repository runs the SQL query against PostgreSQL and returns the result to Express, which sends it back to React as JSON. React then stores the data in state and displays the alarms. I understand this flow because I tested the backend separately with `curl` and then connected the Manage Alarms page to the same API. We kept this structure because it separates the frontend, API logic, SQL queries, and database responsibilities.
+
+#### Persistent Alarm Toggle
+
+* **File:** `client/src/pages/ManageAlarms.jsx`
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+* **What it does and why we kept it:** The alarm toggle allows an alarm to be enabled or disabled from the Manage Alarms screen. I understand that the function first finds the selected alarm, reverses its current `enabled` value, and sends the complete updated alarm data to the backend using a `PUT` request. After the backend returns the updated alarm, React updates the corresponding alarm in the displayed list. We kept this approach because changing the toggle should update the actual stored alarm rather than only changing what is shown on the screen.
+
+#### Alarm Data Retrieval
+
+* **File:** `client/src/pages/ManageAlarms.jsx`
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+* **What it does and why we kept it:** The Manage Alarms page retrieves the current alarms from the Express API when the page loads. I understand that `useEffect` is used to run the fetch request, the returned JSON data is stored in React state, and the alarm information is then used to generate the alarm cards. The backend field names are also converted into the values expected by the interface. We kept this approach because the page should display the actual alarms stored in PostgreSQL instead of relying on temporary frontend sample data.
+
+#### Live Local Clock
+
+* **Files:** `client/src/pages/Home.jsx`, `client/src/pages/ManageAlarms.jsx`
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+* **What it does and why we kept it:** The Home and Manage Alarms pages display the user's current local time and update it every second. I understand that the current time is stored in React state and a `setInterval` inside `useEffect` updates that state once per second. The interval is cleared when the component is removed so it does not continue running unnecessarily. We kept this approach because it provides a simple live clock without requiring a separate backend service or external time source.
+
