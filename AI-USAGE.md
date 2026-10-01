@@ -183,38 +183,38 @@ scores zero.
 
 ### Case 4 - Repeat Days Reset When Editing an Alarm
 
-- **What it gave me:** AI connected the saved alarm data to the Edit Alarm form and loaded the alarm information into the existing form.
-- **What was wrong with it:** When an existing alarm was opened for editing, the saved repeat days could be replaced by the default Monday–Friday selection instead of showing the days that were actually saved for that alarm.
-- **What I did instead:** I checked how the repeat-day value was being loaded into React state and found that the frontend and backend used different field names. I adjusted the initial state so it could use the existing frontend `repeatDays` value or the backend `repeat_days` value before falling back to the default days. I then tested the Edit Alarm screen again to confirm that the saved repeat days were preserved.
-- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+* **What it gave me:** AI connected the saved alarm data to the Edit Alarm form and loaded the alarm information into the existing form.
+* **What was wrong with it:** When an existing alarm was opened for editing, the saved repeat days could be replaced by the default Monday–Friday selection instead of showing the days that were actually saved for that alarm.
+* **What I did instead:** I checked how the repeat-day value was being loaded into React state and found that the frontend and backend used different field names. I adjusted the initial state so it could use the existing frontend `repeatDays` value or the backend `repeat_days` value before falling back to the default days. I then tested the Edit Alarm screen again to confirm that the saved repeat days were preserved.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
 
 ### Case 5 - Duplicate AM/PM Display
 
-- **What it gave me:** AI helped add a live local clock to the Home and Manage Alarms screens using the browser's current time.
-- **What was wrong with it:** The first clock formatting displayed the AM/PM indicator incorrectly, resulting in a duplicate period being shown in the interface.
-- **What I did instead:** I tested the clock in the browser and noticed that the time formatting was already returning the AM/PM value while the interface was also displaying one separately. I changed the formatting so the main time and the AM/PM indicator were handled separately, and then made the AM/PM display uppercase. I tested the result again to make sure the indicator appeared only once.
-- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+* **What it gave me:** AI helped add a live local clock to the Home and Manage Alarms screens using the browser's current time.
+* **What was wrong with it:** The first clock formatting displayed the AM/PM indicator incorrectly, resulting in a duplicate period being shown in the interface.
+* **What I did instead:** I tested the clock in the browser and noticed that the time formatting was already returning the AM/PM value while the interface was also displaying one separately. I changed the formatting so the main time and the AM/PM indicator were handled separately, and then made the AM/PM display uppercase. I tested the result again to make sure the indicator appeared only once.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
 
 ### Case 6 - Next Alarm Calculation Needed Adjustment
 
-- **What it gave me:** AI helped implement the logic for finding the next upcoming alarm from the alarms retrieved from PostgreSQL.
-- **What was wrong with it:** The initial logic needed additional adjustment to correctly account for the current local time, AM/PM conversion, repeat days, and whether an alarm had already passed for the current day. Simply retrieving the enabled alarms was not enough to determine which alarm should actually appear as the next alarm.
-- **What I did instead:** I worked through the time calculation and adjusted the logic to convert the alarm's AM/PM value into 24-hour minutes, compare it with the current local time, and check the upcoming repeat days. The resulting candidates are sorted by the amount of time until they occur, with disabled alarms ignored. I also added the no-active-alarms state when there is no valid upcoming alarm.
-- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+* **What it gave me:** AI helped implement the logic for finding the next upcoming alarm from the alarms retrieved from PostgreSQL.
+* **What was wrong with it:** The initial logic needed additional adjustment to correctly account for the current local time, AM/PM conversion, repeat days, and whether an alarm had already passed for the current day. Simply retrieving the enabled alarms was not enough to determine which alarm should actually appear as the next alarm.
+* **What I did instead:** I worked through the time calculation and adjusted the logic to convert the alarm's AM/PM value into 24-hour minutes, compare it with the current local time, and check the upcoming repeat days. The resulting candidates are sorted by the amount of time until they occur, with disabled alarms ignored. I also added the no-active-alarms state when there is no valid upcoming alarm.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
 
 ### Case 7 - Frontend Data Was Still Using Sample Alarm Information
 
-- **What it gave me:** AI initially built parts of the alarm interface around sample/frontend alarm data before the PostgreSQL integration was completed.
-- **What was wrong with it:** Once the backend was implemented, continuing to rely on sample alarm data would have meant that the interface was not displaying the actual alarms stored in the database.
-- **What I did instead:** I changed the Manage Alarms and Home screens to retrieve alarm data from the Express API using `GET /api/alarms`. The frontend then maps the backend fields into the format used by the React components. This allowed the displayed alarms and next-alarm information to come from the actual PostgreSQL data instead of temporary sample data.
-- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+* **What it gave me:** AI initially built parts of the alarm interface around sample/frontend alarm data before the PostgreSQL integration was completed.
+* **What was wrong with it:** Once the backend was implemented, continuing to rely on sample alarm data would have meant that the interface was not displaying the actual alarms stored in the database.
+* **What I did instead:** I changed the Manage Alarms and Home screens to retrieve alarm data from the Express API using `GET /api/alarms`. The frontend then maps the backend fields into the format used by the React components. This allowed the displayed alarms and next-alarm information to come from the actual PostgreSQL data instead of temporary sample data.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
 
 ### Case 8 - Backend and Frontend Field Names Did Not Match
 
-- **What it gave me:** AI helped connect the React alarm form and the PostgreSQL API.
-- **What was wrong with it:** The frontend and backend used different naming conventions for some fields. For example, the React form used `repeatDays` and `challenge`, while the API and database used `repeat_days` and `challenge_type`. Treating the fields as if they had identical names caused problems when transferring alarm data between the frontend and backend.
-- **What I did instead:** I explicitly mapped the frontend fields to the backend fields when sending and receiving alarm data. This allowed the React components to keep their existing naming while matching the field names expected by the Express API and PostgreSQL database.
-- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+* **What it gave me:** AI helped connect the React alarm form and the PostgreSQL API.
+* **What was wrong with it:** The frontend and backend used different naming conventions for some fields. For example, the React form used `repeatDays` and `challenge`, while the API and database used `repeat_days` and `challenge_type`. Treating the fields as if they had identical names caused problems when transferring alarm data between the frontend and backend.
+* **What I did instead:** I explicitly mapped the frontend fields to the backend fields when sending and receiving alarm data. This allowed the React components to keep their existing naming while matching the field names expected by the Express API and PostgreSQL database.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
 
 ### Case 9 - Active Alarm Did Not Initially Use the Selected Alarm
 
@@ -296,45 +296,45 @@ it in your own words.
 
 #### Alarm Backend Integration
 
-- **File:** `client/src/pages/AlarmForm.jsx`
-- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
-- **What it does and why it is built this way:** I worked with the alarm save logic that connects the Create/Edit Alarm form to the backend. The form sends a `POST` request when creating an alarm and a `PUT` request when editing an existing alarm. I also worked with mapping the frontend fields such as `repeatDays` and `challenge` to the backend fields `repeat_days` and `challenge_type`. The enabled state is preserved when editing an alarm.
+* **File:** `client/src/pages/AlarmForm.jsx`
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+* **What it does and why it is built this way:** I worked with the alarm save logic that connects the Create/Edit Alarm form to the backend. The form sends a `POST` request when creating an alarm and a `PUT` request when editing an existing alarm. I also worked with mapping the frontend fields such as `repeatDays` and `challenge` to the backend fields `repeat_days` and `challenge_type`. The enabled state is preserved when editing an alarm.
 
 #### Alarm Filtering
 
-- **File:** `client/src/pages/ManageAlarms.jsx`
-- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
-- **What it does and why it is built this way:** I worked with the alarm filtering logic for All, Workdays, Weekend, and Inactive alarms. The Workdays filter checks for Monday through Friday, while the Weekend filter checks for Saturday and Sunday. The Inactive filter checks the alarm's `enabled` value. I kept the filtering logic simple so the displayed alarms can change without modifying the stored database data.
+* **File:** `client/src/pages/ManageAlarms.jsx`
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+* **What it does and why it is built this way:** I worked with the alarm filtering logic for All, Workdays, Weekend, and Inactive alarms. The Workdays filter checks for Monday through Friday, while the Weekend filter checks for Saturday and Sunday. The Inactive filter checks the alarm's `enabled` value. I kept the filtering logic simple so the displayed alarms can change without modifying the stored database data.
 
 #### Alarm Time Sorting
 
-- **File:** `client/src/pages/ManageAlarms.jsx`
-- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
-- **What it does and why it is built this way:** I worked with the alarm sorting logic so alarms are displayed from earliest to latest. The code converts the stored AM/PM time into 24-hour minutes and compares the resulting values. This makes the alarm cards appear in chronological order instead of depending on the order returned by the database.
+* **File:** `client/src/pages/ManageAlarms.jsx`
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+* **What it does and why it is built this way:** I worked with the alarm sorting logic so alarms are displayed from earliest to latest. The code converts the stored AM/PM time into 24-hour minutes and compares the resulting values. This makes the alarm cards appear in chronological order instead of depending on the order returned by the database.
 
 #### Interface Styling Update
 
-- **File:** `client/src/styles.css`
-- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
-- **What it does and why it is built this way:** I personally modified the CSS for the latest interface changes, including the live clock styling and its layout on the Home and Manage Alarms screens. I adjusted the styling so the current time and AM/PM indicator fit the existing WAKE Protocol visual design while remaining responsive on smaller screens.
+* **File:** `client/src/styles.css`
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+* **What it does and why it is built this way:** I personally modified the CSS for the latest interface changes, including the live clock styling and its layout on the Home and Manage Alarms screens. I adjusted the styling so the current time and AM/PM indicator fit the existing WAKE Protocol visual design while remaining responsive on smaller screens.
 
 #### Completed Alarm State
 
-File: client/src/pages/ActiveAlarm.jsx
-Commit: https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
-What it does and why it is built this way: I worked with the completed state of the Active Alarm screen. A React state variable keeps track of whether the challenge has been completed, and the interface changes when the value becomes true. This provides a simple way to switch between the active challenge and completed alarm states.
+* **File:** client/src/pages/ActiveAlarm.jsx
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+* **What it does and why it is built this way:**  I worked with the completed state of the Active Alarm screen. A React state variable keeps track of whether the challenge has been completed, and the interface changes when the value becomes true. This provides a simple way to switch between the active challenge and completed alarm states.
 
 #### Math Answer Input Restriction
 
-File: client/src/pages/ActiveAlarm.jsx
-Commit: https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
-What it does and why it is built this way: I worked with the Math challenge answer input and added a small character limit to prevent unnecessarily long answers from being entered. The restriction uses the input value and keeps only the first four characters, which is sufficient for the expected Math challenge answers.
+* **File:** client/src/pages/ActiveAlarm.jsx
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+* **What it does and why it is built this way:** I worked with the Math challenge answer input and added a small character limit to prevent unnecessarily long answers from being entered. The restriction uses the input value and keeps only the first four characters, which is sufficient for the expected Math challenge answers.
 
 #### Active Alarm Interface Styling
 
-File: client/src/styles.css
-Commit: https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
-What it does and why it is built this way: I worked on the CSS styling for the Active Alarm interface, including the challenge area, answer input, alarm information, status elements, spacing, and responsive layout. I kept the changes consistent with the existing WAKE Protocol design so the Active Alarm screen matches the other pages and remains usable on smaller screens.
+* **File:** client/src/styles.css
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+* **What it does and why it is built this way:** I worked on the CSS styling for the Active Alarm interface, including the challenge area, answer input, alarm information, status elements, spacing, and responsive layout. I kept the changes consistent with the existing WAKE Protocol design so the Active Alarm screen matches the other pages and remains usable on smaller screens.
 
 
 ### The AI-written part I understand best
@@ -383,22 +383,19 @@ What it does and why it is built this way: I worked on the CSS styling for the A
 
 #### Backend Challenge Data and Random Selection
 
-- **Files:** `server/challenges.js`, `server/server.js`
-- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
-
-- **What it does and why we kept it:** I understand that the challenge system keeps the predefined Math and Typing challenges in `server/challenges.js` and uses the Express API to select a random challenge when requested. The Math endpoint selects an object containing a question and answer, while the Typing endpoint selects a phrase and returns it to the frontend. We kept the challenge bank as application data instead of adding another database table because these are predefined challenges rather than user-created alarm records. I also tested the endpoints separately to confirm that they returned valid challenge data.
+* **Files:** `server/challenges.js`, `server/server.js`
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+* **What it does and why we kept it:** I understand that the challenge system keeps the predefined Math and Typing challenges in `server/challenges.js` and uses the Express API to select a random challenge when requested. The Math endpoint selects an object containing a question and answer, while the Typing endpoint selects a phrase and returns it to the frontend. We kept the challenge bank as application data instead of adding another database table because these are predefined challenges rather than user-created alarm records. I also tested the endpoints separately to confirm that they returned valid challenge data.
 
 #### Challenge API Functions in the Frontend
 
-- **Files:** `client/src/api/httpApi.js`, `client/src/api/index.js`, `client/src/api/mockApi.js`
-- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
-
-- **What it does and why we kept it:** I understand that the frontend has separate API functions for requesting Math and Typing challenges from the backend. `httpApi.js` defines the requests to `/api/challenges/math` and `/api/challenges/typing`, while `index.js` makes these functions available to the rest of the React application. I also understand that `mockApi.js` contains mock versions so the existing mock API structure is still available. We kept this approach because the Active Alarm component can request a challenge through the existing API layer without putting the request details directly inside the page component.
+* **Files:** `client/src/api/httpApi.js`, `client/src/api/index.js`, `client/src/api/mockApi.js`
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+* **What it does and why we kept it:** I understand that the frontend has separate API functions for requesting Math and Typing challenges from the backend. `httpApi.js` defines the requests to `/api/challenges/math` and `/api/challenges/typing`, while `index.js` makes these functions available to the rest of the React application. I also understand that `mockApi.js` contains mock versions so the existing mock API structure is still available. We kept this approach because the Active Alarm component can request a challenge through the existing API layer without putting the request details directly inside the page component.
 
 #### Active Alarm Challenge Completion Logic
 
-- **File:** `client/src/pages/ActiveAlarm.jsx`
-- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
-
-- **What it does and why we kept it:** I understand how the Active Alarm component handles the result of the challenge. It checks the user's Math answer against the answer returned by the backend or compares the Typing response with the returned phrase. If the answer is incorrect, the challenge remains active and the input is cleared. If the answer is correct, the `completed` state changes and the interface displays the completed condition. We kept this behavior because the alarm should remain active until the required challenge has been answered correctly.
+* **File:** `client/src/pages/ActiveAlarm.jsx`
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+* **What it does and why we kept it:** I understand how the Active Alarm component handles the result of the challenge. It checks the user's Math answer against the answer returned by the backend or compares the Typing response with the returned phrase. If the answer is incorrect, the challenge remains active and the input is cleared. If the answer is correct, the `completed` state changes and the interface displays the completed condition. We kept this behavior because the alarm should remain active until the required challenge has been answered correctly.
 
