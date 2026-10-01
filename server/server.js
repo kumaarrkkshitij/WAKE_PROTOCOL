@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import { pool } from './db/pool.js'
 import * as alarms from './alarmsRepo.js'
+import { mathChallenges, typingChallenges } from './challenges.js'
 
 const app = express()
 
@@ -34,6 +35,20 @@ app.get('/readyz', async (request, response) => {
     console.error('readyz failed:', error.message)
     response.status(503).json({ ok: false, db: 'down' })
   }
+})
+
+app.get('/api/challenges/math', (request, response) => {
+  const challenge =
+    mathChallenges[Math.floor(Math.random() * mathChallenges.length)]
+
+  response.json(challenge)
+})
+
+app.get('/api/challenges/typing', (request, response) => {
+  const phrase =
+    typingChallenges[Math.floor(Math.random() * typingChallenges.length)]
+
+  response.json({ phrase })
 })
 
 app.get('/api/alarms', async (request, response, next) => {

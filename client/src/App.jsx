@@ -18,7 +18,15 @@ export default function App() {
 
   return (
     <div className="wake-app">
-      {page === 'home' && <Home />}
+      {page === 'home' && (
+        <Home
+          onAlarmStart={(alarm) => {
+            setEditingAlarm(alarm)
+            setActiveChallenge(alarm.challenge_type)
+            setPage('active-alarm')
+          }}
+        />
+      )}
 
       {page === 'manage' && (
         <ManageAlarms
@@ -47,7 +55,13 @@ export default function App() {
         />
       )}
 
-{page === 'active-math' && (
+{page === 'active-alarm' && (
+  <ActiveAlarm
+    alarm={editingAlarm}
+    challengeType={activeChallenge}
+    onDismiss={() => setPage('home')}
+  />
+)}
   <>
     <ActiveAlarm challengeType="Math" />
 

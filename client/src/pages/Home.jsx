@@ -75,7 +75,7 @@ function formatRepeatDays(repeatDays) {
   return repeatDays.join(' · ')
 }
 
-export default function Home() {
+export default function Home({ onAlarmStart }) {
   const [alarms, setAlarms] = useState([])
   const [loading, setLoading] = useState(true)
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -148,7 +148,10 @@ export default function Home() {
         <div className="home-content">
 
           {/* Next Alarm */}
-          <section className="alarm-hero">
+          <section
+            className="alarm-hero"
+            onClick={() => nextAlarm && onAlarmStart?.(nextAlarm.alarm)}
+          >
             <div className="ambient-glow glow-top" />
             <div className="ambient-glow glow-bottom" />
 

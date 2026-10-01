@@ -1,8 +1,50 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { getMathChallenge, getTypingChallenge } from '../api'
 
-export default function ActiveAlarm({ challengeType = 'Math', onDismiss }) {
+export default function ActiveAlarm({ alarm, challengeType = 'Math', onDismiss }) {
   const [answer, setAnswer] = useState('')
+  const [challenge, setChallenge] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [completed, setCompleted] = useState(false)
+
   const isTyping = challengeType === 'Typing'
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadChallenge = async () => {
+      setLoading(true)
+      setError('')
+      setAnswer('')
+      setChallenge(null)
+      setCompleted(false)
+
+      try {
+        const data = isTyping
+          ? await getTypingChallenge()
+          : await getMathChallenge()
+
+        if (!cancelled) {
+          setChallenge(data)
+        }
+      } catch (requestError) {
+        if (!cancelled) {
+          setError(requestError.message || 'Unable to load challenge.')
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadChallenge()
+
+    return () => {
+      cancelled = true
+    }
+  }, [isTyping])
 
   const handleKey = (value) => {
     setAnswer((current) => `${current}${value}`.slice(0, 4))
@@ -10,6 +52,26 @@ export default function ActiveAlarm({ challengeType = 'Math', onDismiss }) {
 
   const handleBackspace = () => {
     setAnswer((current) => current.slice(0, -1))
+  }
+
+  const handleMathSubmit = () => {
+    if (!challenge) return
+
+    if (Number(answer) === Number(challenge.answer)) {
+      setCompleted(true)
+    } else {
+      setAnswer('')
+    }
+  }
+
+  const handleTypingSubmit = () => {
+    if (!challenge) return
+
+    if (answer.trim() === challenge.phrase.trim()) {
+      setCompleted(true)
+    } else {
+      setAnswer('')
+    }
   }
 
   return (
@@ -35,8 +97,8 @@ export default function ActiveAlarm({ challengeType = 'Math', onDismiss }) {
       {/* Alarm Time */}
       <section className="active-time-section">
         <div className="active-time-display">
-          <span>06:30</span>
-          <strong>AM</strong>
+          <span>{alarm?.time || '06:30'}</span>
+          <strong>{alarm?.period || 'AM'}</strong>
         </div>
 
         <div className="active-lock-badge">
@@ -58,27 +120,37 @@ export default function ActiveAlarm({ challengeType = 'Math', onDismiss }) {
               {isTyping ? 'Typing Mission' : 'Math Mission'}
             </span>
           </div>
-
-          <span className="stage-badge">
-            STAGE 02 / 03
-          </span>
         </div>
 
         {/* Progress */}
         <div className="challenge-progress">
           <span className="complete" />
-          <span className="complete" />
-          <span />
         </div>
 
-        {isTyping ? (
+        {completed ? (
+          <div className="challenge-prompt">
+            <span>CHALLENGE COMPLETE</span>
+
+            <div className="math-equation">
+              ✓ ALARM DISARMED
+            </div>
+          </div>
+        ) : loading ? (
+          <div className="challenge-prompt">
+            <span>CHALLENGE ERROR</span>
+
+            <div className="math-equation">
+              {error}
+            </div>
+          </div>
+        ) : isTyping ? (
           <>
             {/* Typing Challenge */}
             <div className="challenge-prompt">
               <span>S TYPE TO DEACTIVATE</span>
 
               <div className="typing-phrase">
-                WAKE UP AND START STRONG
+                {challenge?.phrase}
               </div>
 
               <input
@@ -88,14 +160,13 @@ export default function ActiveAlarm({ challengeType = 'Math', onDismiss }) {
                 onChange={(event) => setAnswer(event.target.value)}
                 placeholder="Type the phrase..."
                 autoComplete="off"
-                autoCapitalize="characters"
               />
             </div>
 
             <button
               className="typing-submit"
               type="button"
-              onClick={() => setAnswer('')}
+              onClick={handleTypingSubmit}
             >
               ✓ SUBMIT
             </button>
@@ -107,7 +178,7 @@ export default function ActiveAlarm({ challengeType = 'Math', onDismiss }) {
               <span>SOLVE TO DEACTIVATE</span>
 
               <div className="math-equation">
-                (47 + 28) − 19 = ?
+                {challenge?.question} = ?
               </div>
 
               <div className="answer-display">
@@ -147,7 +218,7 @@ export default function ActiveAlarm({ challengeType = 'Math', onDismiss }) {
               <button
                 type="button"
                 className="keypad-submit"
-                onClick={() => {}}
+                onClick={handleMathSubmit}
               >
                 ✓
               </button>
@@ -170,16 +241,6 @@ export default function ActiveAlarm({ challengeType = 'Math', onDismiss }) {
           </div>
 
           <span className="playing-indicator">●</span>
-        </div>
-
-        <div className="active-disclaimer">
-          <span>◆</span>
-
-          <p>
-            {isTyping
-              ? 'Type the complete phrase correctly to silence the alarm.'
-              : 'Solve all 3 equations correctly to silence the alarm.'}
-          </p>
         </div>
 
       </section>

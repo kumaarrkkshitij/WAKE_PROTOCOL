@@ -73,3 +73,12 @@ export async function deleteSighting(id) {
   await delay()
   write(read().filter((row) => String(row.id) !== String(id)))
 }
+
+export const getMathChallenge = async () => ({
+  question: '27 - 9',
+  answer: 18,
+})
+
+export const getTypingChallenge = async () => ({
+  phrase: 'Wake up and remember that today is still unwritten.',
+})

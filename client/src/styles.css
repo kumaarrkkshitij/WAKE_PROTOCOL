@@ -1368,8 +1368,8 @@ button {
   
   .challenge-progress {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
+    grid-template-columns: 1fr;
+    gap: 0;
     margin-top: 14px;
   }
   

@@ -38,3 +38,9 @@ export const updateSighting = (id, input) =>
 
 export const deleteSighting = (id) =>
   request(`/api/sightings/${id}`, { method: 'DELETE' })
+
+export const getMathChallenge = () =>
+  request('/api/challenges/math')
+
+export const getTypingChallenge = () =>
+  request('/api/challenges/typing')

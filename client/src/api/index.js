@@ -34,4 +34,6 @@ export const {
   createSighting,
   updateSighting,
   deleteSighting,
+  getMathChallenge,
+  getTypingChallenge,
 } = implementation
