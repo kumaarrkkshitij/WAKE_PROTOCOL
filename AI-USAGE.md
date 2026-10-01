@@ -123,6 +123,38 @@ At least six entries. One per real use. Every entry needs a commit link.
 * **What I kept, what I changed, and why:** I used the live clock approach on both Home and Manage Alarms. I adjusted the formatting after testing because the first version displayed the AM/PM indicator incorrectly. I changed the display so the time and AM/PM are separated and the AM/PM indicator appears once in uppercase. I kept the one-second update interval because it provides a continuously updated local clock without requiring a backend request.
 * **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
 
+### 2026-10-01 - Backend Challenge System
+
+* **Tool:** ChatGPT
+* **What I asked for:** I asked AI how to add Math and Typing challenges to the WAKE Protocol backend and make them available through API endpoints.
+* **What it gave back:** AI provided guidance for creating a backend challenge file containing Math and Typing challenge data and adding API endpoints that randomly select a challenge when requested.
+* **What I kept, what I changed, and why:** I used the suggested structure for the backend challenge system and added the Math and Typing challenge data. I kept the challenges as application data instead of storing them in PostgreSQL because they are predefined challenge content rather than user-created alarm data. I also tested the endpoints to confirm that they returned valid Math and Typing challenges.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+
+### 2026-10-01 - Frontend Challenge API Integration
+
+* **Tool:** ChatGPT
+* **What I asked for:** I asked AI how to connect the React Active Alarm screen to the new backend Math and Typing challenge endpoints.
+* **What it gave back:** AI provided guidance for adding API functions for requesting Math and Typing challenges and exposing those functions through the frontend API layer.
+* **What I kept, what I changed, and why:** I added the Math and Typing challenge request functions to the frontend API layer and configured the application to use the real backend API. I also kept mock versions of the functions so the existing mock API structure remained available. I tested the connection by requesting both types of challenges from the running backend.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+
+### 2026-10-01 - Active Alarm Challenge Integration
+
+* **Tool:** ChatGPT
+* **What I asked for:** I asked AI how to make the Active Alarm screen retrieve the correct type of challenge and validate the user's answer before allowing the alarm to be completed.
+* **What it gave back:** AI provided guidance for retrieving a Math or Typing challenge based on the selected alarm's challenge type and checking the user's answer against the returned challenge.
+* **What I kept, what I changed, and why:** I connected the Active Alarm screen to the challenge API and made it request either a Math or Typing challenge depending on the alarm configuration. Math answers are checked numerically, while Typing answers are compared with the returned phrase. Incorrect answers keep the challenge active, while correct answers change the alarm to its completed state. I kept this approach because the challenge selected when creating the alarm should determine the challenge required when the alarm becomes active.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+
+### 2026-10-01 - Active Alarm UI Refinement
+
+* **Tool:** ChatGPT
+* **What I asked for:** I asked AI to help refine the Active Alarm interface after connecting the real alarm and challenge data.
+* **What it gave back:** AI provided guidance for simplifying the challenge progress indicator, removing unnecessary interface elements, and keeping the alarm and music status information visible.
+* **What I kept, what I changed, and why:** I removed the previous STAGE 02 / 03 indicator and replaced it with a single full-width progress bar. I also removed the unnecessary bottom disclaimer while keeping the alarm and music status display. I kept the existing WAKE Protocol visual style so the Active Alarm screen remained consistent with the other pages.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+
 ## 2. Where the AI got it wrong
 
 Three cases. Be specific. If you write that the AI was never wrong, this section
@@ -183,6 +215,20 @@ scores zero.
 - **What was wrong with it:** The frontend and backend used different naming conventions for some fields. For example, the React form used `repeatDays` and `challenge`, while the API and database used `repeat_days` and `challenge_type`. Treating the fields as if they had identical names caused problems when transferring alarm data between the frontend and backend.
 - **What I did instead:** I explicitly mapped the frontend fields to the backend fields when sending and receiving alarm data. This allowed the React components to keep their existing naming while matching the field names expected by the Express API and PostgreSQL database.
 - **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
+
+### Case 9 - Active Alarm Did Not Initially Use the Selected Alarm
+
+* **What it gave me:** AI initially implemented the Active Alarm screen partly as a standalone Math/Typing preview and used a fixed alarm time instead of fully connecting the screen to the alarm selected from the Home page.
+* **What was wrong with it:** The Active Alarm screen was not correctly representing the actual alarm being started. The Home screen could show an upcoming alarm at one time while the Active Alarm screen displayed a different hardcoded time, such as `6:30 PM`. Also, the challenge type could be treated as a manually selected preview instead of being determined by the challenge type saved with the selected alarm.
+* **What I did instead:** I traced the alarm flow from `Home.jsx` through `App.jsx` into `ActiveAlarm.jsx`. I changed the flow so the selected alarm is stored before navigating to the Active Alarm screen, and its `challenge_type` is used to determine whether the user receives a Math or Typing challenge. I also passed the selected alarm into `ActiveAlarm` so the screen displays its actual `time` and `period` instead of a hardcoded value. I tested the Home → Active Alarm flow and confirmed that the displayed alarm time and challenge type matched the selected alarm.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+
+### Case 10 - Challenge Completion Needed a Separate UI State
+
+* **What it gave me:** AI initially focused on retrieving and validating the Math or Typing challenge but did not provide a clear completed state for the Active Alarm interface.
+* **What was wrong with it:** Successfully answering the challenge should visibly change the Active Alarm screen. Simply validating the answer was not enough because the interface still needed to communicate that the challenge had been completed and the alarm was no longer in its active challenge state.
+* **What I did instead:** I added a separate `completed` React state to `ActiveAlarm.jsx`. When the user enters the correct Math answer or the correct Typing phrase, the state changes to completed and the interface displays the completed/disarmed condition. Incorrect answers keep the challenge active. This made the result of completing the challenge clear to the user.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
 
 ## 3. Who wrote what
 
@@ -272,6 +318,24 @@ it in your own words.
 - **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
 - **What it does and why it is built this way:** I personally modified the CSS for the latest interface changes, including the live clock styling and its layout on the Home and Manage Alarms screens. I adjusted the styling so the current time and AM/PM indicator fit the existing WAKE Protocol visual design while remaining responsive on smaller screens.
 
+#### Completed Alarm State
+
+File: client/src/pages/ActiveAlarm.jsx
+Commit: https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+What it does and why it is built this way: I worked with the completed state of the Active Alarm screen. A React state variable keeps track of whether the challenge has been completed, and the interface changes when the value becomes true. This provides a simple way to switch between the active challenge and completed alarm states.
+
+#### Math Answer Input Restriction
+
+File: client/src/pages/ActiveAlarm.jsx
+Commit: https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+What it does and why it is built this way: I worked with the Math challenge answer input and added a small character limit to prevent unnecessarily long answers from being entered. The restriction uses the input value and keeps only the first four characters, which is sufficient for the expected Math challenge answers.
+
+#### Active Alarm Interface Styling
+
+File: client/src/styles.css
+Commit: https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+What it does and why it is built this way: I worked on the CSS styling for the Active Alarm interface, including the challenge area, answer input, alarm information, status elements, spacing, and responsive layout. I kept the changes consistent with the existing WAKE Protocol design so the Active Alarm screen matches the other pages and remains usable on smaller screens.
+
 
 ### The AI-written part I understand best
 
@@ -316,4 +380,25 @@ it in your own words.
 * **Files:** `client/src/pages/Home.jsx`, `client/src/pages/ManageAlarms.jsx`
 * **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
 * **What it does and why we kept it:** The Home and Manage Alarms pages display the user's current local time and update it every second. I understand that the current time is stored in React state and a `setInterval` inside `useEffect` updates that state once per second. The interval is cleared when the component is removed so it does not continue running unnecessarily. We kept this approach because it provides a simple live clock without requiring a separate backend service or external time source.
+
+#### Backend Challenge Data and Random Selection
+
+- **Files:** `server/challenges.js`, `server/server.js`
+- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+
+- **What it does and why we kept it:** I understand that the challenge system keeps the predefined Math and Typing challenges in `server/challenges.js` and uses the Express API to select a random challenge when requested. The Math endpoint selects an object containing a question and answer, while the Typing endpoint selects a phrase and returns it to the frontend. We kept the challenge bank as application data instead of adding another database table because these are predefined challenges rather than user-created alarm records. I also tested the endpoints separately to confirm that they returned valid challenge data.
+
+#### Challenge API Functions in the Frontend
+
+- **Files:** `client/src/api/httpApi.js`, `client/src/api/index.js`, `client/src/api/mockApi.js`
+- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+
+- **What it does and why we kept it:** I understand that the frontend has separate API functions for requesting Math and Typing challenges from the backend. `httpApi.js` defines the requests to `/api/challenges/math` and `/api/challenges/typing`, while `index.js` makes these functions available to the rest of the React application. I also understand that `mockApi.js` contains mock versions so the existing mock API structure is still available. We kept this approach because the Active Alarm component can request a challenge through the existing API layer without putting the request details directly inside the page component.
+
+#### Active Alarm Challenge Completion Logic
+
+- **File:** `client/src/pages/ActiveAlarm.jsx`
+- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
+
+- **What it does and why we kept it:** I understand how the Active Alarm component handles the result of the challenge. It checks the user's Math answer against the answer returned by the backend or compares the Typing response with the returned phrase. If the answer is incorrect, the challenge remains active and the input is cleared. If the answer is correct, the `completed` state changes and the interface displays the completed condition. We kept this behavior because the alarm should remain active until the required challenge has been answered correctly.
 
