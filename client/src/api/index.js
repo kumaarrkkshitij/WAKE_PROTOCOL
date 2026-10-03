@@ -36,4 +36,6 @@ export const {
   deleteSighting,
   getMathChallenge,
   getTypingChallenge,
+  getAllMathChallenges,
+  getAllTypingChallenges,
 } = implementation

@@ -73,6 +73,16 @@ app.get('/api/alarms/:id', async (request, response, next) => {
   }
 })
 
+app.get('/api/challenges/math/all', (request, response) => {
+  response.json(mathChallenges)
+})
+
+app.get('/api/challenges/typing/all', (request, response) => {
+  response.json(
+    typingChallenges.map((phrase) => ({ phrase }))
+  )
+})
+
 // Validation lives on the server because the client can be bypassed. The
 // browser form is for a fast, friendly message; this is for correctness.
 function validate(body) {

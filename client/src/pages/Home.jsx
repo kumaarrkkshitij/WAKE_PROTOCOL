@@ -1,6 +1,69 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const dayKeys = ['SU', 'M', 'T', 'W', 'TH', 'F', 'SA']
+
+function getLocalDateKey(date = new Date()) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
+function getConsistencyData() {
+  const stored =
+    JSON.parse(localStorage.getItem('wakeConsistency')) || {}
+
+  const today = new Date()
+
+  let currentStreak = 0
+
+  for (let offset = 0; offset < 365; offset++) {
+    const date = new Date(today)
+    date.setDate(today.getDate() - offset)
+
+    const dateKey = getLocalDateKey(date)
+
+    if (stored[dateKey] === 'completed') {
+      currentStreak++
+    } else {
+      break
+    }
+  }
+
+  let personalBest = 0
+  let runningStreak = 0
+
+  const dates = Object.keys(stored).sort()
+
+  for (const dateKey of dates) {
+    if (stored[dateKey] === 'completed') {
+      runningStreak++
+      personalBest = Math.max(personalBest, runningStreak)
+    } else {
+      runningStreak = 0
+    }
+  }
+
+  const lastSevenDays = []
+
+  for (let offset = 6; offset >= 0; offset--) {
+    const date = new Date(today)
+    date.setDate(today.getDate() - offset)
+
+    const dateKey = getLocalDateKey(date)
+
+    lastSevenDays.push(
+      stored[dateKey] === 'completed'
+    )
+  }
+
+  return {
+    currentStreak,
+    personalBest,
+    lastSevenDays,
+  }
+}
 
 function getNextAlarm(alarmList) {
   const now = new Date()
@@ -40,16 +103,62 @@ function getNextAlarm(alarmList) {
 
         candidates.push({
           alarm,
-          minutesUntil: offset * 24 * 60 + alarmMinutes - currentMinutes,
+          minutesUntil:
+            offset * 24 * 60 +
+            alarmMinutes -
+            currentMinutes,
         })
 
         break
       }
     })
 
-  candidates.sort((a, b) => a.minutesUntil - b.minutesUntil)
+  candidates.sort(
+    (a, b) => a.minutesUntil - b.minutesUntil
+  )
 
   return candidates[0] || null
+}
+
+function getTargetSleep(nextAlarm) {
+  if (!nextAlarm) {
+    return null
+  }
+
+  const [hours, minutes] =
+    nextAlarm.alarm.time.split(':').map(Number)
+
+  let hour24 = hours
+
+  if (nextAlarm.alarm.period === 'AM') {
+    hour24 = hours === 12 ? 0 : hours
+  } else {
+    hour24 = hours === 12 ? 12 : hours + 12
+  }
+
+  const sleepMinutes =
+    (hour24 * 60 + minutes - 8 * 60 + 24 * 60) %
+    (24 * 60)
+
+  const sleepHour24 = Math.floor(sleepMinutes / 60)
+  const sleepMinute = sleepMinutes % 60
+
+  const period = sleepHour24 >= 12 ? 'PM' : 'AM'
+
+  const displayHour =
+    sleepHour24 === 0
+      ? 12
+      : sleepHour24 > 12
+        ? sleepHour24 - 12
+        : sleepHour24
+
+  return {
+    time: `${displayHour}:${String(sleepMinute).padStart(
+      2,
+      '0'
+    )}`,
+    period,
+  }
 }
 
 function formatRepeatDays(repeatDays) {
@@ -66,9 +175,7 @@ function formatRepeatDays(repeatDays) {
     return 'Mon — Fri'
   }
 
-  if (
-    repeatDays.length === 7
-  ) {
+  if (repeatDays.length === 7) {
     return 'Every Day'
   }
 
@@ -79,6 +186,13 @@ export default function Home({ onAlarmStart }) {
   const [alarms, setAlarms] = useState([])
   const [loading, setLoading] = useState(true)
   const [currentTime, setCurrentTime] = useState(new Date())
+  const [consistency, setConsistency] = useState(
+    getConsistencyData()
+  )
+
+  const triggeredAlarmRef = useRef(
+    sessionStorage.getItem('wakeTriggeredAlarm') || null
+  )
 
   useEffect(() => {
     fetch('http://localhost:3000/api/alarms')
@@ -108,7 +222,99 @@ export default function Home({ onAlarmStart }) {
     return () => clearInterval(timer)
   }, [])
 
+  useEffect(() => {
+    const updateConsistency = () => {
+      setConsistency(getConsistencyData())
+    }
+
+    window.addEventListener(
+      'wake-consistency-updated',
+      updateConsistency
+    )
+
+    window.addEventListener(
+      'storage',
+      updateConsistency
+    )
+
+    return () => {
+      window.removeEventListener(
+        'wake-consistency-updated',
+        updateConsistency
+      )
+
+      window.removeEventListener(
+        'storage',
+        updateConsistency
+      )
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!alarms.length) {
+      return
+    }
+
+    console.log('ALARM CHECK:', {
+      now: currentTime.toLocaleTimeString(),
+      alarms,
+    })
+
+    const currentDay = currentTime.getDay()
+    const currentHour = currentTime.getHours()
+    const currentMinute = currentTime.getMinutes()
+
+    alarms
+      .filter((alarm) => alarm.enabled)
+      .forEach((alarm) => {
+        const [hours, minutes] =
+          alarm.time.split(':').map(Number)
+
+        let hour24 = hours
+
+        if (alarm.period === 'AM') {
+          hour24 = hours === 12 ? 0 : hours
+        } else {
+          hour24 = hours === 12 ? 12 : hours + 12
+        }
+
+        const repeatDays = alarm.repeat_days || []
+        const dayKey = dayKeys[currentDay]
+
+        const isScheduledNow =
+        repeatDays.includes(dayKey) &&
+        hour24 === currentHour &&
+        minutes === currentMinute
+      
+      console.log('ALARM MATCH CHECK:', {
+        alarm: alarm.name,
+        alarmTime: `${hour24}:${String(minutes).padStart(2, '0')}`,
+        currentTime: `${currentHour}:${String(currentMinute).padStart(2, '0')}`,
+        alarmDay: repeatDays,
+        currentDay: dayKey,
+        isScheduledNow,
+      })
+
+        const occurrenceKey =
+          `${alarm.id}-${currentTime.toDateString()}-${alarm.time}-${alarm.period}`
+
+        if (
+          isScheduledNow &&
+          triggeredAlarmRef.current !== occurrenceKey
+        ) {
+          triggeredAlarmRef.current = occurrenceKey
+          sessionStorage.setItem(
+            'wakeTriggeredAlarm',
+            occurrenceKey
+          )
+        
+          onAlarmStart?.(alarm)
+        }
+      })
+  }, [alarms, currentTime, onAlarmStart])
+
   const nextAlarm = getNextAlarm(alarms)
+  const targetSleep = getTargetSleep(nextAlarm)
 
   return (
     <>
@@ -127,19 +333,23 @@ export default function Home({ onAlarmStart }) {
 
         <div className="live-time">
           <span>
-            {currentTime.toLocaleTimeString([], {
-              hour: 'numeric',
-              minute: '2-digit',
-              hour12: true,
-            }).split(' ')[0]}
+            {currentTime
+              .toLocaleTimeString([], {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+              })
+              .split(' ')[0]}
           </span>
 
           <small>
-            {currentTime.toLocaleTimeString([], {
-              hour: 'numeric',
-              minute: '2-digit',
-              hour12: true,
-            }).split(' ')[1]}
+            {currentTime
+              .toLocaleTimeString([], {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+              })
+              .split(' ')[1]}
           </small>
         </div>
       </header>
@@ -150,7 +360,10 @@ export default function Home({ onAlarmStart }) {
           {/* Next Alarm */}
           <section
             className="alarm-hero"
-            onClick={() => nextAlarm && onAlarmStart?.(nextAlarm.alarm)}
+            onClick={() =>
+              nextAlarm &&
+              onAlarmStart?.(nextAlarm.alarm)
+            }
           >
             <div className="ambient-glow glow-top" />
             <div className="ambient-glow glow-bottom" />
@@ -172,14 +385,20 @@ export default function Home({ onAlarmStart }) {
                     </div>
 
                     <span className="repeat-label">
-                      {formatRepeatDays(nextAlarm.alarm.repeat_days)}
+                      {formatRepeatDays(
+                        nextAlarm.alarm.repeat_days
+                      )}
                     </span>
                   </div>
 
                   <div className="alarm-time-row">
                     <div className="alarm-time">
-                      <span>{nextAlarm.alarm.time}</span>
-                      <strong>{nextAlarm.alarm.period}</strong>
+                      <span>
+                        {nextAlarm.alarm.time}
+                      </span>
+                      <strong>
+                        {nextAlarm.alarm.period}
+                      </strong>
                     </div>
 
                     <div className="alarm-icon-box">
@@ -213,22 +432,26 @@ export default function Home({ onAlarmStart }) {
             </div>
 
             <div className="stat-value">
-              <strong>7</strong>
+              <strong>{consistency.currentStreak}</strong>
               <span>days</span>
             </div>
 
             <div className="streak-bars">
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
+              {[...consistency.lastSevenDays].reverse().map(
+                (completed, index) => (
+                  <span
+                    key={index}
+                    className={
+                      completed ? 'completed' : ''
+                    }
+                  />
+                )
+              )}
             </div>
 
             <span className="stat-footer">
-              Personal best: 14d
+              Personal best:{' '}
+              {consistency.personalBest}d
             </span>
           </section>
 
@@ -247,11 +470,22 @@ export default function Home({ onAlarmStart }) {
               <div>
                 <div className="target-sleep">
                   <span>Target Sleep:</span>
-                  <strong>10:45</strong>
-                  <b>PM</b>
+
+                  {targetSleep ? (
+                    <>
+                      <strong>
+                        {targetSleep.time}
+                      </strong>
+                      <b>
+                        {targetSleep.period}
+                      </b>
+                    </>
+                  ) : (
+                    <strong>--:--</strong>
+                  )}
                 </div>
 
-                <p>7h 45m calculated rest cycle</p>
+                <p>8h calculated rest cycle</p>
               </div>
 
               <div className="sleep-icon-box">

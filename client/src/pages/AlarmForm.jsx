@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { saveAlarmMusic } from '../utils/alarmMusic'
 
 const days = [
   { key: 'M', label: 'M' },
@@ -10,24 +11,98 @@ const days = [
   { key: 'SU', label: 'S' },
 ]
 
-export default function AlarmForm({ mode = 'create', alarm = null, onCancel, onSave }) {
-  const [time, setTime] = useState(alarm?.time || '06:30')
-  const [period, setPeriod] = useState(alarm?.period || 'AM')
+export default function AlarmForm({
+  mode = 'create',
+  alarm = null,
+  onCancel,
+  onSave,
+}) {
+  const [time, setTime] = useState(
+    alarm?.time || '06:30'
+  )
+
+  const [period, setPeriod] = useState(
+    alarm?.period || 'AM'
+  )
+
   const [name, setName] = useState(
     alarm?.name || 'Work Morning Power Wake'
   )
+
   const [repeatDays, setRepeatDays] = useState(
-    alarm?.repeatDays || alarm?.repeat_days || ['M', 'T', 'W', 'TH', 'F']
+    alarm?.repeatDays ||
+      alarm?.repeat_days || [
+        'M',
+        'T',
+        'W',
+        'TH',
+        'F',
+      ]
   )
+
   const [challenge, setChallenge] = useState(
-    alarm?.challengeType || 'Math'
+    alarm?.challenge_type ||
+      alarm?.challengeType ||
+      'Math'
   )
-  const [music, setMusic] = useState(alarm?.music || '')
+
+  const [music, setMusic] = useState(
+    alarm?.music || ''
+  )
+
+  const [musicFile, setMusicFile] = useState(null)
+
+  const [currentTime, setCurrentTime] =
+    useState(new Date())
+
+  useEffect(() => {
+    if (!alarm) {
+      return
+    }
+
+    setTime(alarm.time || '06:30')
+
+    setPeriod(alarm.period || 'AM')
+
+    setName(
+      alarm.name || 'Work Morning Power Wake'
+    )
+
+    setRepeatDays(
+      alarm.repeatDays ||
+        alarm.repeat_days || [
+          'M',
+          'T',
+          'W',
+          'TH',
+          'F',
+        ]
+    )
+
+    setChallenge(
+      alarm.challenge_type ||
+        alarm.challengeType ||
+        'Math'
+    )
+
+    setMusic(alarm.music || '')
+    setMusicFile(null)
+  }, [alarm])
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [])
 
   const toggleDay = (day) => {
     setRepeatDays((current) =>
       current.includes(day)
-        ? current.filter((item) => item !== day)
+        ? current.filter(
+            (item) => item !== day
+          )
         : [...current, day]
     )
   }
@@ -37,6 +112,7 @@ export default function AlarmForm({ mode = 'create', alarm = null, onCancel, onS
 
     if (file) {
       setMusic(file.name)
+      setMusicFile(file)
     }
   }
 
@@ -51,50 +127,98 @@ export default function AlarmForm({ mode = 'create', alarm = null, onCancel, onS
         music,
         enabled: alarm?.enabled ?? true,
       }
-  
+
       if (mode === 'create') {
-        const response = await fetch('http://localhost:3000/api/alarms', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(alarmData),
-        })
-  
+        const response = await fetch(
+          'http://localhost:3000/api/alarms',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify(alarmData),
+          }
+        )
+
         if (!response.ok) {
-          throw new Error('Failed to create alarm')
+          throw new Error(
+            'Failed to create alarm'
+          )
         }
-  
-        const savedAlarm = await response.json()
-  
-        console.log('Alarm created:', savedAlarm)
+
+        const savedAlarm =
+          await response.json()
+
+        if (musicFile) {
+          await saveAlarmMusic(
+            savedAlarm.id,
+            musicFile
+          )
+        }
+
+        console.log(
+          'Alarm created:',
+          savedAlarm
+        )
+
         onSave(savedAlarm)
         return
       }
-  
+
       const response = await fetch(
         `http://localhost:3000/api/alarms/${alarm.id}`,
         {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type':
+              'application/json',
           },
           body: JSON.stringify(alarmData),
         }
       )
-  
+
       if (!response.ok) {
-        throw new Error('Failed to update alarm')
+        throw new Error(
+          'Failed to update alarm'
+        )
       }
-  
-      const updatedAlarm = await response.json()
-  
-      console.log('Alarm updated:', updatedAlarm)
+
+      const updatedAlarm =
+        await response.json()
+
+      if (musicFile) {
+        await saveAlarmMusic(
+          updatedAlarm.id,
+          musicFile
+        )
+      }
+
+      console.log(
+        'Alarm updated:',
+        updatedAlarm
+      )
+
       onSave(updatedAlarm)
     } catch (error) {
-      console.error('Failed to save alarm:', error)
+      console.error(
+        'Failed to save alarm:',
+        error
+      )
     }
   }
+
+  const formattedCurrentTime =
+    currentTime.toLocaleTimeString([], {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    })
+
+  const [
+    currentTimeValue,
+    currentPeriod,
+  ] = formattedCurrentTime.split(' ')
 
   return (
     <>
@@ -113,19 +237,28 @@ export default function AlarmForm({ mode = 'create', alarm = null, onCancel, onS
               <span className="status-dot" />
               WAKE // PROTOCOL
             </span>
-            <h1>{mode === 'edit' ? 'EDIT ALARM' : 'CREATE ALARM'}</h1>
+
+            <h1>
+              {mode === 'edit'
+                ? 'EDIT ALARM'
+                : 'CREATE ALARM'}
+            </h1>
           </div>
         </div>
 
         <div className="live-time">
-          <span>10:42</span>
-          <small>PM</small>
+          <span>
+            {currentTimeValue}
+          </span>
+
+          <small>
+            {currentPeriod}
+          </small>
         </div>
       </header>
 
       <main className="main-content">
         <div className="alarm-form-content">
-
           <div className="form-actions">
             <button
               className="cancel-button"
@@ -147,28 +280,52 @@ export default function AlarmForm({ mode = 'create', alarm = null, onCancel, onS
           </div>
 
           {/* Time */}
-            <section className="form-card time-card">
-            <span className="form-label">ALARM TIME</span>
+          <section className="form-card time-card">
+            <span className="form-label">
+              ALARM TIME
+            </span>
 
             <div className="roller-time-picker">
-
               {/* Hour */}
               <div className="time-column">
                 <button
                   type="button"
                   className="roller-value faded"
                   onClick={() => {
-                    const currentHour = Number(time.split(':')[0])
-                    const previousHour = currentHour === 1 ? 12 : currentHour - 1
+                    const currentHour =
+                      Number(
+                        time.split(':')[0]
+                      )
+
+                    const previousHour =
+                      currentHour === 1
+                        ? 12
+                        : currentHour - 1
 
                     setTime(
-                      `${String(previousHour).padStart(2, '0')}:${time.split(':')[1]}`
+                      `${String(
+                        previousHour
+                      ).padStart(
+                        2,
+                        '0'
+                      )}:${time.split(':')[1]}`
                     )
                   }}
                 >
                   {(() => {
-                    const currentHour = Number(time.split(':')[0])
-                    return String(currentHour === 1 ? 12 : currentHour - 1).padStart(2, '0')
+                    const currentHour =
+                      Number(
+                        time.split(':')[0]
+                      )
+
+                    return String(
+                      currentHour === 1
+                        ? 12
+                        : currentHour - 1
+                    ).padStart(
+                      2,
+                      '0'
+                    )
                   })()}
                 </button>
 
@@ -180,22 +337,47 @@ export default function AlarmForm({ mode = 'create', alarm = null, onCancel, onS
                   type="button"
                   className="roller-value faded"
                   onClick={() => {
-                    const currentHour = Number(time.split(':')[0])
-                    const nextHour = currentHour === 12 ? 1 : currentHour + 1
+                    const currentHour =
+                      Number(
+                        time.split(':')[0]
+                      )
+
+                    const nextHour =
+                      currentHour === 12
+                        ? 1
+                        : currentHour + 1
 
                     setTime(
-                      `${String(nextHour).padStart(2, '0')}:${time.split(':')[1]}`
+                      `${String(
+                        nextHour
+                      ).padStart(
+                        2,
+                        '0'
+                      )}:${time.split(':')[1]}`
                     )
                   }}
                 >
                   {(() => {
-                    const currentHour = Number(time.split(':')[0])
-                    return String(currentHour === 12 ? 1 : currentHour + 1).padStart(2, '0')
+                    const currentHour =
+                      Number(
+                        time.split(':')[0]
+                      )
+
+                    return String(
+                      currentHour === 12
+                        ? 1
+                        : currentHour + 1
+                    ).padStart(
+                      2,
+                      '0'
+                    )
                   })()}
                 </button>
               </div>
 
-              <span className="time-separator">:</span>
+              <span className="time-separator">
+                :
+              </span>
 
               {/* Minute */}
               <div className="time-column">
@@ -203,17 +385,43 @@ export default function AlarmForm({ mode = 'create', alarm = null, onCancel, onS
                   type="button"
                   className="roller-value faded"
                   onClick={() => {
-                    const [hours, minutes] = time.split(':')
-                    const previousMinute = Number(minutes) === 0 ? 59 : Number(minutes) - 1
+                    const [
+                      hours,
+                      minutes,
+                    ] =
+                      time.split(':')
+
+                    const previousMinute =
+                      Number(minutes) ===
+                      0
+                        ? 59
+                        : Number(minutes) -
+                          1
 
                     setTime(
-                      `${hours}:${String(previousMinute).padStart(2, '0')}`
+                      `${hours}:${String(
+                        previousMinute
+                      ).padStart(
+                        2,
+                        '0'
+                      )}`
                     )
                   }}
                 >
                   {(() => {
-                    const minutes = Number(time.split(':')[1])
-                    return String(minutes === 0 ? 59 : minutes - 1).padStart(2, '0')
+                    const minutes =
+                      Number(
+                        time.split(':')[1]
+                      )
+
+                    return String(
+                      minutes === 0
+                        ? 59
+                        : minutes - 1
+                    ).padStart(
+                      2,
+                      '0'
+                    )
                   })()}
                 </button>
 
@@ -225,17 +433,43 @@ export default function AlarmForm({ mode = 'create', alarm = null, onCancel, onS
                   type="button"
                   className="roller-value faded"
                   onClick={() => {
-                    const [hours, minutes] = time.split(':')
-                    const nextMinute = Number(minutes) === 59 ? 0 : Number(minutes) + 1
+                    const [
+                      hours,
+                      minutes,
+                    ] =
+                      time.split(':')
+
+                    const nextMinute =
+                      Number(minutes) ===
+                      59
+                        ? 0
+                        : Number(minutes) +
+                          1
 
                     setTime(
-                      `${hours}:${String(nextMinute).padStart(2, '0')}`
+                      `${hours}:${String(
+                        nextMinute
+                      ).padStart(
+                        2,
+                        '0'
+                      )}`
                     )
                   }}
                 >
                   {(() => {
-                    const minutes = Number(time.split(':')[1])
-                    return String(minutes === 59 ? 0 : minutes + 1).padStart(2, '0')
+                    const minutes =
+                      Number(
+                        time.split(':')[1]
+                      )
+
+                    return String(
+                      minutes === 59
+                        ? 0
+                        : minutes + 1
+                    ).padStart(
+                      2,
+                      '0'
+                    )
                   })()}
                 </button>
               </div>
@@ -244,34 +478,51 @@ export default function AlarmForm({ mode = 'create', alarm = null, onCancel, onS
               <div className="roller-period">
                 <button
                   type="button"
-                  className={period === 'AM' ? 'selected' : ''}
-                  onClick={() => setPeriod('AM')}
+                  className={
+                    period === 'AM'
+                      ? 'selected'
+                      : ''
+                  }
+                  onClick={() =>
+                    setPeriod('AM')
+                  }
                 >
                   AM
                 </button>
 
                 <button
                   type="button"
-                  className={period === 'PM' ? 'selected' : ''}
-                  onClick={() => setPeriod('PM')}
+                  className={
+                    period === 'PM'
+                      ? 'selected'
+                      : ''
+                  }
+                  onClick={() =>
+                    setPeriod('PM')
+                  }
                 >
                   PM
                 </button>
               </div>
-
             </div>
 
             <div className="time-helper">
-              Tap the values above or below to adjust
+              Tap the values above or below
+              to adjust
             </div>
-            </section>
+          </section>
 
           {/* Repeat */}
           <section className="form-card">
             <div className="form-section-header">
-              <span className="form-label">REPEAT CYCLE</span>
+              <span className="form-label">
+                REPEAT CYCLE
+              </span>
+
               <span className="form-value">
-                {repeatDays.length === 5 ? 'Every Weekday' : 'Custom'}
+                {repeatDays.length === 5
+                  ? 'Every Weekday'
+                  : 'Custom'}
               </span>
             </div>
 
@@ -280,9 +531,15 @@ export default function AlarmForm({ mode = 'create', alarm = null, onCancel, onS
                 <button
                   key={day.key}
                   className={
-                    repeatDays.includes(day.key) ? 'selected' : ''
+                    repeatDays.includes(
+                      day.key
+                    )
+                      ? 'selected'
+                      : ''
                   }
-                  onClick={() => toggleDay(day.key)}
+                  onClick={() =>
+                    toggleDay(day.key)
+                  }
                 >
                   {day.label}
                 </button>
@@ -304,7 +561,11 @@ export default function AlarmForm({ mode = 'create', alarm = null, onCancel, onS
               className="text-input"
               type="text"
               value={name}
-              onChange={(event) => setName(event.target.value)}
+              onChange={(event) =>
+                setName(
+                  event.target.value
+                )
+              }
               placeholder="Enter alarm name"
             />
           </section>
@@ -312,52 +573,85 @@ export default function AlarmForm({ mode = 'create', alarm = null, onCancel, onS
           {/* Challenge */}
           <section className="form-card">
             <div className="form-section-header">
-              <span className="form-label">DISARM MISSION</span>
-              <span className="required-label">REQUIRED</span>
+              <span className="form-label">
+                DISARM MISSION
+              </span>
+
+              <span className="required-label">
+                REQUIRED
+              </span>
             </div>
 
             <div className="challenge-options">
               <button
-                className={challenge === 'Math' ? 'selected' : ''}
-                onClick={() => setChallenge('Math')}
+                className={
+                  challenge === 'Math'
+                    ? 'selected'
+                    : ''
+                }
+                onClick={() =>
+                  setChallenge('Math')
+                }
               >
                 <span>🧮</span>
+
                 <strong>Math</strong>
-                <small>Solve equations</small>
+
+                <small>
+                  Solve equations
+                </small>
               </button>
 
               <button
-                className={challenge === 'Typing' ? 'selected' : ''}
-                onClick={() => setChallenge('Typing')}
+                className={
+                  challenge === 'Typing'
+                    ? 'selected'
+                    : ''
+                }
+                onClick={() =>
+                  setChallenge('Typing')
+                }
               >
                 <span>⌨</span>
+
                 <strong>Typing</strong>
-                <small>Type the phrase</small>
+
+                <small>
+                  Type the phrase
+                </small>
               </button>
             </div>
           </section>
 
           {/* Music */}
           <section className="form-card">
-            <span className="form-label">ALARM MUSIC</span>
+            <span className="form-label">
+              ALARM MUSIC
+            </span>
 
             <label className="music-picker">
-              <span className="music-icon">♪</span>
+              <span className="music-icon">
+                ♪
+              </span>
 
               <div>
                 <strong>
-                  {music || 'Choose local music'}
+                  {music ||
+                    'Choose local music'}
                 </strong>
 
                 <small>
-                  Select an audio file from your device
+                  Select an audio file
+                  from your device
                 </small>
               </div>
 
               <input
                 type="file"
                 accept="audio/*"
-                onChange={handleMusicChange}
+                onChange={
+                  handleMusicChange
+                }
               />
             </label>
           </section>
@@ -370,9 +664,9 @@ export default function AlarmForm({ mode = 'create', alarm = null, onCancel, onS
           </button>
 
           <p className="form-footer">
-            WAKE Protocol • Alarm Configuration
+            WAKE Protocol • Alarm
+            Configuration
           </p>
-
         </div>
       </main>
     </>

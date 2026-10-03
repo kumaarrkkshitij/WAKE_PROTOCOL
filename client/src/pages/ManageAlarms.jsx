@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { deleteAlarmMusic } from '../utils/alarmMusic'
 
 export default function ManageAlarms({ onCreate, onEdit }) {
   const [alarms, setAlarms] = useState([])
@@ -11,7 +12,7 @@ export default function ManageAlarms({ onCreate, onEdit }) {
         if (!response.ok) {
           throw new Error('Failed to load alarms')
         }
-  
+
         return response.json()
       })
       .then((data) => {
@@ -20,10 +21,9 @@ export default function ManageAlarms({ onCreate, onEdit }) {
           days: alarm.repeat_days?.join(', ') || '',
           challenge: alarm.challenge_type,
         }))
-      
+
         setAlarms(mappedAlarms)
       })
-
       .catch((error) => {
         console.error('Failed to load alarms:', error)
       })
@@ -39,11 +39,11 @@ export default function ManageAlarms({ onCreate, onEdit }) {
 
   const toggleAlarm = async (id) => {
     const alarm = alarms.find((item) => item.id === id)
-  
+
     if (!alarm) return
-  
+
     const updatedEnabled = !alarm.enabled
-  
+
     try {
       const response = await fetch(
         `http://localhost:3000/api/alarms/${id}`,
@@ -63,13 +63,13 @@ export default function ManageAlarms({ onCreate, onEdit }) {
           }),
         }
       )
-  
+
       if (!response.ok) {
         throw new Error('Failed to update alarm')
       }
-  
+
       const updatedAlarm = await response.json()
-  
+
       setAlarms((currentAlarms) =>
         currentAlarms.map((item) =>
           item.id === id
@@ -87,8 +87,27 @@ export default function ManageAlarms({ onCreate, onEdit }) {
     }
   }
 
-  const deleteAlarm = (id) => {
-    setAlarms(alarms.filter((alarm) => alarm.id !== id))
+  const deleteAlarm = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/alarms/${id}`,
+        {
+          method: 'DELETE',
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Failed to delete alarm')
+      }
+
+      await deleteAlarmMusic(id)
+
+      setAlarms((currentAlarms) =>
+        currentAlarms.filter((alarm) => alarm.id !== id)
+      )
+    } catch (error) {
+      console.error('Failed to delete alarm:', error)
+    }
   }
 
   const filteredAlarms = alarms.filter((alarm) => {
@@ -98,19 +117,21 @@ export default function ManageAlarms({ onCreate, onEdit }) {
       return !alarm.enabled
     }
   
+    const repeatDays = alarm.repeat_days || []
+  
     if (filter === 'workdays') {
       const workdays = ['M', 'T', 'W', 'TH', 'F']
   
-      return workdays.some((day) =>
-        alarm.repeat_days?.includes(day)
+      return repeatDays.some((day) =>
+        workdays.includes(day)
       )
     }
   
     if (filter === 'weekend') {
       const weekend = ['SA', 'SU']
   
-      return weekend.some((day) =>
-        alarm.repeat_days?.includes(day)
+      return repeatDays.some((day) =>
+        weekend.includes(day)
       )
     }
   
@@ -120,18 +141,18 @@ export default function ManageAlarms({ onCreate, onEdit }) {
   const sortedAlarms = [...filteredAlarms].sort((a, b) => {
     const toMinutes = (alarm) => {
       const [hours, minutes] = alarm.time.split(':').map(Number)
-  
+
       let hour24 = hours
-  
+
       if (alarm.period === 'AM') {
         hour24 = hours === 12 ? 0 : hours
       } else {
         hour24 = hours === 12 ? 12 : hours + 12
       }
-  
+
       return hour24 * 60 + minutes
     }
-  
+
     return toMinutes(a) - toMinutes(b)
   })
 
@@ -198,11 +219,16 @@ export default function ManageAlarms({ onCreate, onEdit }) {
               ['all', `All (${alarms.length})`],
               ['workdays', 'Workdays'],
               ['weekend', 'Weekend'],
-              ['inactive', `Inactive (${alarms.filter((a) => !a.enabled).length})`],
+              [
+                'inactive',
+                `Inactive (${alarms.filter((a) => !a.enabled).length})`,
+              ],
             ].map(([value, label]) => (
               <button
                 key={value}
-                className={`filter-chip ${filter === value ? 'active' : ''}`}
+                className={`filter-chip ${
+                  filter === value ? 'active' : ''
+                }`}
                 onClick={() => setFilter(value)}
               >
                 {label}
@@ -249,7 +275,9 @@ export default function ManageAlarms({ onCreate, onEdit }) {
 
                 <div className="mission-box">
                   <div className="mission-icon">
-                    {alarm.challenge.startsWith('Math') ? '∑' : '⌨'}
+                    {alarm.challenge.startsWith('Math')
+                      ? '∑'
+                      : '⌨'}
                   </div>
 
                   <div className="mission-info">
@@ -266,12 +294,12 @@ export default function ManageAlarms({ onCreate, onEdit }) {
                   </span>
 
                   <div className="alarm-actions">
-                  <button
-                    title="Edit Alarm"
-                    onClick={() => onEdit(alarm)}
-                  >
-                    ✎
-                  </button> 
+                    <button
+                      title="Edit Alarm"
+                      onClick={() => onEdit(alarm)}
+                    >
+                      ✎
+                    </button>
 
                     <button
                       title="Delete Alarm"
@@ -284,20 +312,7 @@ export default function ManageAlarms({ onCreate, onEdit }) {
               </section>
             ))}
           </div>
-
-          {/* Motivation */}
-          <section className="motivation-card">
-            <div className="motivation-icon">⚡</div>
-
-            <div>
-              <span>WAKEUP STREAK</span>
-              <strong>14 Days Perfect</strong>
-              <p>
-                Your protocol prevented 18 snooze cycles this week.
-              </p>
-            </div>
-          </section>
-
+          
         </div>
       </main>
     </>

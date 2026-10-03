@@ -44,3 +44,9 @@ export const getMathChallenge = () =>
 
 export const getTypingChallenge = () =>
   request('/api/challenges/typing')
+
+export const getAllMathChallenges = () =>
+  request('/api/challenges/math/all')
+
+export const getAllTypingChallenges = () =>
+  request('/api/challenges/typing/all')
