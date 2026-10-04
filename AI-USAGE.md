@@ -277,12 +277,6 @@ it in your own words.
 * **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/5266abe083b21adfb9333efc03453d4a2d6d5503
 * **What it does and why it is built this way:** I worked on the navigation buttons used for the Home and Manage screens. Each button calls the navigation function with the page it should open, and the current page is used to show which navigation item is active. I understand this because it uses React props, button events, and conditional class names.
 
-#### Alarm Toggle
-
-* **File:** `client/src/pages/ManageAlarms.jsx`
-* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/5266abe083b21adfb9333efc03453d4a2d6d5503
-* **What it does and why it is built this way:** I worked on the alarm enable/disable toggle. The function finds the alarm with the selected ID and creates an updated alarm object with its `enabled` value switched. React state is then updated with the modified alarm list. This was kept simple so the alarm status could be changed directly from the Manage Alarms screen.
-
 #### Page Connection
 
 * **File:** `client/src/App.jsx`
@@ -299,19 +293,13 @@ it in your own words.
 
 * **File:** `server/alarmsRepo.js`
 * **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/dd12f2b013da0b48f3c4489b0b65e5f63d00ab1b
-* **What it does and why it is built this way:** I adapted the starter `sightingsRepo.js` into `alarmsRepo.js` and changed the SQL queries for the WAKE Protocol alarm data. I worked with the `SELECT`, `INSERT`, `UPDATE`, and `DELETE` queries and the parameters passed through `$1`, `$2`, and other placeholders. I also worked with `RETURNING *` so the created or updated alarm could be returned by the API. I tested these operations through `curl` and verified that the database correctly created, retrieved, updated, and deleted alarm records.
+* **What it does and why it is built this way:** I partially worked on the backend repository by adapting the starter sightingsRepo.js into alarmsRepo.js for WAKE Protocol. I modified the SQL queries to work with alarm data and worked with the SELECT, INSERT, UPDATE, and DELETE operations, including PostgreSQL parameters such as $1, $2, and $3. I also worked with RETURNING * so created or updated alarm records could be returned by the API. I tested the CRUD operations through curl and verified that the database correctly created, retrieved, updated, and deleted alarm records.
 
 #### Alarm Name and Create/Edit Form
 
 * **File:** `client/src/pages/AlarmForm.jsx`
 * **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/dd12f2b013da0b48f3c4489b0b65e5f63d00ab1b
-* **What it does and why it is built this way:** I worked on the alarm name part of the Create/Edit Alarm form because the alarm needed a name that could be entered and carried with the rest of the alarm information. I worked with the name state and the form field so the entered alarm name became part of the alarm data. The same `AlarmForm` component is used for both creating and editing alarms, so keeping the alarm name in the shared form allows both operations to use the same field.
-
-#### Manage Alarms API Connection and UI Changes
-
-* **File:** `client/src/pages/ManageAlarms.jsx`
-* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/dd12f2b013da0b48f3c4489b0b65e5f63d00ab1b
-* **What it does and why it is built this way:** I changed the Manage Alarms page so it fetches alarm data from the real backend instead of using the previous sample alarm data. I tested it with an empty database and confirmed that no alarms were displayed. I also manually fixed the alarm card UI and related CSS because the alarm name was missing from the cards even though the name was already being created in the Create/Edit Alarm form. I added the alarm name to the displayed alarm information so users can identify their alarms.
+* **What it does and why it is built this way:** I worked on the alarm name part of the Create/Edit Alarm form. I added the alarm name to the form state and connected the input field so the entered name became part of the alarm data. Since the same AlarmForm component is used for both creating and editing alarms, keeping the alarm name in the shared form allows the same field to work for both operations.
 
 #### Edit Alarm State
 
@@ -323,37 +311,25 @@ it in your own words.
 
 * **File:** `server/server.js`
 * **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/dd12f2b013da0b48f3c4489b0b65e5f63d00ab1b
-* **What it does and why it is built this way:** I adapted parts of the existing Express server for WAKE Protocol rather than writing the entire server from scratch. I changed the repository import from the starter `sightingsRepo.js` to `alarmsRepo.js`, added the alarm API routes, and changed the validation to match the alarm fields and the Math/Typing challenge types. I also tested the API endpoints with `curl`. The existing server structure and some of the surrounding code remained from the starter project and AI-assisted implementation.
-
-#### Alarm Backend Integration
-
-* **File:** `client/src/pages/AlarmForm.jsx`
-* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
-* **What it does and why it is built this way:** I worked with the alarm save logic that connects the Create/Edit Alarm form to the backend. The form sends a `POST` request when creating an alarm and a `PUT` request when editing an existing alarm. I also worked with mapping the frontend fields such as `repeatDays` and `challenge` to the backend fields `repeat_days` and `challenge_type`. The enabled state is preserved when editing an alarm.
+* **What it does and why it is built this way:** I partially worked on adapting the existing Express server for WAKE Protocol rather than writing the entire server from scratch. I changed the repository import from the starter sightingsRepo.js to alarmsRepo.js and worked with the alarm API routes so they could use the new alarm repository. I also tested the alarm API endpoints with curl to verify that the backend could create, retrieve, update, and delete alarm records. The existing server structure and some of the surrounding code remained from the starter project and AI-assisted implementation.
 
 #### Alarm Filtering
 
 * **File:** `client/src/pages/ManageAlarms.jsx`
 * **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
-* **What it does and why it is built this way:** I worked with the alarm filtering logic for All, Workdays, Weekend, and Inactive alarms. The Workdays filter checks for Monday through Friday, while the Weekend filter checks for Saturday and Sunday. The Inactive filter checks the alarm's `enabled` value. I kept the filtering logic simple so the displayed alarms can change without modifying the stored database data.
-
-#### Alarm Time Sorting
-
-* **File:** `client/src/pages/ManageAlarms.jsx`
-* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
-* **What it does and why it is built this way:** I worked with the alarm sorting logic so alarms are displayed from earliest to latest. The code converts the stored AM/PM time into 24-hour minutes and compares the resulting values. This makes the alarm cards appear in chronological order instead of depending on the order returned by the database.
+* **What it does and why it is built this way:** I worked on the alarm filtering logic for All, Workdays, Weekend, and Inactive alarms. The Workdays filter checks Monday through Friday, while the Weekend filter checks Saturday and Sunday. The Inactive filter checks whether the alarm is disabled. I kept the filtering logic simple so the displayed alarms can be changed without modifying the stored alarm data.
 
 #### Interface Styling Update
 
 * **File:** `client/src/styles.css`
 * **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/20be116723f4157817d0aced9f6c3b70e0d68a34
 * **What it does and why it is built this way:** I personally modified the CSS for the latest interface changes, including the live clock styling and its layout on the Home and Manage Alarms screens. I adjusted the styling so the current time and AM/PM indicator fit the existing WAKE Protocol visual design while remaining responsive on smaller screens.
-
+  
 #### Completed Alarm State
 
 * **File:** client/src/pages/ActiveAlarm.jsx
 * **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/514749f3563b6c8eafc60168ac54f4c6cfb4cccc
-* **What it does and why it is built this way:**  I worked with the completed state of the Active Alarm screen. A React state variable keeps track of whether the challenge has been completed, and the interface changes when the value becomes true. This provides a simple way to switch between the active challenge and completed alarm states.
+* **What it does and why it is built this way:**  I worked on the text shown when the alarm is completed. I changed the completed-state message to clearly show “ALARM DISENGAGED” and “WAKE PROTOCOL COMPLETE” so the user can immediately understand that the alarm has been successfully dismissed.
 
 #### Math Answer Input Restriction
 
