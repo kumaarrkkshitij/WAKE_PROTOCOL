@@ -178,7 +178,7 @@ At least six entries. One per real use. Every entry needs a commit link.
 * **What it gave back:** ChatGPT helped identify hardcoded `localhost:3000` API calls, organize the frontend API layer around environment variables, troubleshoot missing local dependencies and environment configuration, and verify the GitHub Pages → Render API → PostgreSQL deployment flow.
 * **What I kept, what I changed, and why:** I reviewed and applied the suggested configuration changes, tested the application locally, fixed the local environment setup, configured the required GitHub repository variables, and verified the deployed application myself. I kept the existing application features and only changed the configuration and API connection code needed for local and production environments to work correctly.
 - **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/288384aed91c957e1d014fd0f8faf6ececc88a3d
-- 
+  
 ## 2. Where the AI got it wrong
 
 Three cases. Be specific. If you write that the AI was never wrong, this section
