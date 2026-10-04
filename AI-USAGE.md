@@ -161,7 +161,7 @@ At least six entries. One per real use. Every entry needs a commit link.
 * **What I asked for:** I asked AI to help integrate the live alarm-triggering behavior into the Home page and fix several user-facing issues that appeared during testing. This included making the selected alarm open the Active Alarm screen at the correct scheduled time, preventing the same alarm from immediately triggering again after it was dismissed, fixing the consistency display order, improving the Workdays and Weekend filters, and making sure saved alarm information was correctly restored when editing an alarm.
 * **What it gave back:** AI provided React logic using the current local time, repeat-day information, and alarm data retrieved from the backend to determine when an alarm should become active. It also provided a session-based occurrence check to prevent the same alarm occurrence from triggering repeatedly. For the other fixes, AI provided updates to the filtering, consistency display, and AlarmForm state-handling logic.
 * **What I kept, what I changed, and why:** I tested the changes against the actual application behavior and kept the parts that matched the intended WAKE Protocol workflow. I kept the alarm occurrence tracking because dismissing an alarm should not immediately trigger the same alarm again during the same scheduled occurrence. I also kept the filtering behavior where alarms containing weekday repeat days appear under Workdays and alarms containing Saturday or Sunday appear under Weekend. I tested the saved alarm values when reopening Edit Alarm and adjusted the form handling so the backend field names were correctly recognized.
-* **Commit:** 
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/c11c2b09ce94ba3169847922e79d32279c5e8077
 
 ### 2026-10-03 - Backend Challenge API and Frontend Configuration Fixes
 
@@ -169,7 +169,7 @@ At least six entries. One per real use. Every entry needs a commit link.
 * **What I asked for:** I asked AI to help finish the backend API integration for the Math and Typing challenge system and fix the connection between the React frontend and Express backend. I also asked for help adding endpoints that could provide the complete challenge pools instead of only returning one random challenge.
 * **What it gave back:** AI provided the frontend API functions for retrieving all Math and Typing challenges, backend endpoints for returning the complete challenge lists, and the required frontend API configuration so the React application uses the real Express server instead of the mock API. AI also helped update the Active Alarm logic so it could retrieve the challenge pool from the backend, randomize the available challenges, and track previously used challenges during the session.
 * **What I kept, what I changed, and why:** I kept the backend API approach because the challenge data should be retrieved from the Express server rather than being hardcoded directly inside the Active Alarm component. I configured the frontend environment to use the real backend API and tested the endpoints through the running application. I also kept the session-based challenge tracking so the same alarm does not repeatedly receive the same challenge until the available challenge pool has been used.
-* **Commit:** 
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/c11c2b09ce94ba3169847922e79d32279c5e8077
 
 ## 2. Where the AI got it wrong
 
@@ -251,7 +251,7 @@ scores zero.
 * **What it gave me:** AI helped add the new challenge API functions and connect the Active Alarm screen to the challenge system.
 * **What was wrong with it:** The frontend initially continued using the mock API implementation instead of the real Express API. This happened because the client did not have the required `.env` configuration, so the API selection logic continued to use the mock implementation. As a result, the new functions for retrieving the complete challenge pools were not available through the selected API implementation and the application produced an error when the Active Alarm screen tried to use them.
 * **What I did instead:** I checked the frontend API configuration and identified that the client `.env` file was missing. I created the environment configuration with `VITE_USE_MOCK_API=false` and the Express backend URL, then restarted the Vite development server so the environment variables would be loaded. I tested the application again and confirmed that the Active Alarm screen was now communicating with the real backend.
-* **Commit:** 
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/c11c2b09ce94ba3169847922e79d32279c5e8077
 
 ## 3. Who wrote what
 
@@ -425,5 +425,5 @@ it in your own words.
 #### Frontend API Layer and Backend API Flow
 
 * **Files:** `client/src/api/httpApi.js`, `client/src/api/index.js`, `server/server.js`
-* **Commit:** 
+* **Commit:**  https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/c11c2b09ce94ba3169847922e79d32279c5e8077
 * **What it does and why we kept it:** I understand how the frontend API layer connects the React components to the Express backend. The functions in `httpApi.js` build requests to specific backend endpoints and return the JSON response. `index.js` selects whether the application uses the mock API or the real HTTP API based on the environment configuration. On the backend, Express receives the request through the matching route, performs the required operation, and sends the result back as JSON. I understand this flow because I tested the API endpoints and fixed the frontend configuration so the application uses the real backend instead of the mock implementation. We kept this structure because it separates API requests from the React page components and allows the frontend to communicate with the backend through reusable functions.
