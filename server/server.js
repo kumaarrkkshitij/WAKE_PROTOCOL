@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
+import helmet from 'helmet'
 import { pool } from './db/pool.js'
 import * as alarms from './alarmsRepo.js'
 import { mathChallenges, typingChallenges } from './challenges.js'
@@ -19,6 +20,7 @@ const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173')
   .filter(Boolean)
 
 app.use(cors({ origin: allowedOrigins }))
+app.use(helmet())
 app.use(express.json({ limit: '100kb' }))
 
 // Is the process alive?
@@ -134,6 +136,7 @@ function validate(body) {
     },
   }
 }
+
 app.post('/api/alarms', async (request, response, next) => {
   const { errors, value } = validate(request.body ?? {})
 
