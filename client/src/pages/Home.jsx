@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { listAlarms } from '../api/index.js'
 
 const dayKeys = ['SU', 'M', 'T', 'W', 'TH', 'F', 'SA']
 
@@ -68,14 +69,16 @@ function getConsistencyData() {
 function getNextAlarm(alarmList) {
   const now = new Date()
   const currentDay = now.getDay()
-  const currentMinutes = now.getHours() * 60 + now.getMinutes()
+  const currentMinutes =
+    now.getHours() * 60 + now.getMinutes()
 
   const candidates = []
 
   alarmList
     .filter((alarm) => alarm.enabled)
     .forEach((alarm) => {
-      const [hours, minutes] = alarm.time.split(':').map(Number)
+      const [hours, minutes] =
+        alarm.time.split(':').map(Number)
 
       let hour24 = hours
 
@@ -90,14 +93,20 @@ function getNextAlarm(alarmList) {
       const repeatDays = alarm.repeat_days || []
 
       for (let offset = 0; offset < 7; offset++) {
-        const targetDay = (currentDay + offset) % 7
-        const targetDayKey = dayKeys[targetDay]
+        const targetDay =
+          (currentDay + offset) % 7
+
+        const targetDayKey =
+          dayKeys[targetDay]
 
         if (!repeatDays.includes(targetDayKey)) {
           continue
         }
 
-        if (offset === 0 && alarmMinutes <= currentMinutes) {
+        if (
+          offset === 0 &&
+          alarmMinutes <= currentMinutes
+        ) {
           continue
         }
 
@@ -140,10 +149,14 @@ function getTargetSleep(nextAlarm) {
     (hour24 * 60 + minutes - 8 * 60 + 24 * 60) %
     (24 * 60)
 
-  const sleepHour24 = Math.floor(sleepMinutes / 60)
-  const sleepMinute = sleepMinutes % 60
+  const sleepHour24 =
+    Math.floor(sleepMinutes / 60)
 
-  const period = sleepHour24 >= 12 ? 'PM' : 'AM'
+  const sleepMinute =
+    sleepMinutes % 60
+
+  const period =
+    sleepHour24 >= 12 ? 'PM' : 'AM'
 
   const displayHour =
     sleepHour24 === 0
@@ -153,10 +166,9 @@ function getTargetSleep(nextAlarm) {
         : sleepHour24
 
   return {
-    time: `${displayHour}:${String(sleepMinute).padStart(
-      2,
-      '0'
-    )}`,
+    time: `${displayHour}:${String(
+      sleepMinute
+    ).padStart(2, '0')}`,
     period,
   }
 }
@@ -168,8 +180,8 @@ function formatRepeatDays(repeatDays) {
 
   if (
     repeatDays.length === 5 &&
-    ['M', 'T', 'W', 'TH', 'F'].every((day) =>
-      repeatDays.includes(day)
+    ['M', 'T', 'W', 'TH', 'F'].every(
+      (day) => repeatDays.includes(day)
     )
   ) {
     return 'Mon — Fri'
@@ -185,29 +197,29 @@ function formatRepeatDays(repeatDays) {
 export default function Home({ onAlarmStart }) {
   const [alarms, setAlarms] = useState([])
   const [loading, setLoading] = useState(true)
-  const [currentTime, setCurrentTime] = useState(new Date())
+  const [currentTime, setCurrentTime] =
+    useState(new Date())
+
   const [consistency, setConsistency] = useState(
     getConsistencyData()
   )
 
   const triggeredAlarmRef = useRef(
-    sessionStorage.getItem('wakeTriggeredAlarm') || null
+    sessionStorage.getItem(
+      'wakeTriggeredAlarm'
+    ) || null
   )
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/alarms')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to load alarms')
-        }
-
-        return response.json()
-      })
+    listAlarms()
       .then((data) => {
         setAlarms(data)
       })
       .catch((error) => {
-        console.error('Failed to load alarms:', error)
+        console.error(
+          'Failed to load alarms:',
+          error
+        )
       })
       .finally(() => {
         setLoading(false)
@@ -275,58 +287,80 @@ export default function Home({ onAlarmStart }) {
         if (alarm.period === 'AM') {
           hour24 = hours === 12 ? 0 : hours
         } else {
-          hour24 = hours === 12 ? 12 : hours + 12
+          hour24 =
+            hours === 12 ? 12 : hours + 12
         }
 
-        const repeatDays = alarm.repeat_days || []
-        const dayKey = dayKeys[currentDay]
+        const repeatDays =
+          alarm.repeat_days || []
+
+        const dayKey =
+          dayKeys[currentDay]
 
         const isScheduledNow =
-        repeatDays.includes(dayKey) &&
-        hour24 === currentHour &&
-        minutes === currentMinute
-      
-      console.log('ALARM MATCH CHECK:', {
-        alarm: alarm.name,
-        alarmTime: `${hour24}:${String(minutes).padStart(2, '0')}`,
-        currentTime: `${currentHour}:${String(currentMinute).padStart(2, '0')}`,
-        alarmDay: repeatDays,
-        currentDay: dayKey,
-        isScheduledNow,
-      })
+          repeatDays.includes(dayKey) &&
+          hour24 === currentHour &&
+          minutes === currentMinute
+
+        console.log(
+          'ALARM MATCH CHECK:',
+          {
+            alarm: alarm.name,
+            alarmTime: `${hour24}:${String(
+              minutes
+            ).padStart(2, '0')}`,
+            currentTime: `${currentHour}:${String(
+              currentMinute
+            ).padStart(2, '0')}`,
+            alarmDay: repeatDays,
+            currentDay: dayKey,
+            isScheduledNow,
+          }
+        )
 
         const occurrenceKey =
           `${alarm.id}-${currentTime.toDateString()}-${alarm.time}-${alarm.period}`
 
         if (
           isScheduledNow &&
-          triggeredAlarmRef.current !== occurrenceKey
+          triggeredAlarmRef.current !==
+            occurrenceKey
         ) {
-          triggeredAlarmRef.current = occurrenceKey
+          triggeredAlarmRef.current =
+            occurrenceKey
+
           sessionStorage.setItem(
             'wakeTriggeredAlarm',
             occurrenceKey
           )
-        
+
           onAlarmStart?.(alarm)
         }
       })
-  }, [alarms, currentTime, onAlarmStart])
+  }, [
+    alarms,
+    currentTime,
+    onAlarmStart,
+  ])
 
   const nextAlarm = getNextAlarm(alarms)
-  const targetSleep = getTargetSleep(nextAlarm)
+  const targetSleep =
+    getTargetSleep(nextAlarm)
 
   return (
     <>
       <header className="top-bar">
         <div className="brand">
-          <div className="wake-logo">W</div>
+          <div className="wake-logo">
+            W
+          </div>
 
           <div className="brand-text">
             <span className="protocol-label">
               <span className="status-dot" />
               WAKE // PROTOCOL
             </span>
+
             <h1>WAKE HUD</h1>
           </div>
         </div>
@@ -386,7 +420,8 @@ export default function Home({ onAlarmStart }) {
 
                     <span className="repeat-label">
                       {formatRepeatDays(
-                        nextAlarm.alarm.repeat_days
+                        nextAlarm.alarm
+                          .repeat_days
                       )}
                     </span>
                   </div>
@@ -396,6 +431,7 @@ export default function Home({ onAlarmStart }) {
                       <span>
                         {nextAlarm.alarm.time}
                       </span>
+
                       <strong>
                         {nextAlarm.alarm.period}
                       </strong>
@@ -428,25 +464,36 @@ export default function Home({ onAlarmStart }) {
           <section className="stat-card">
             <div className="stat-header">
               <span>CONSISTENCY</span>
-              <span className="stat-icon">🔥</span>
+              <span className="stat-icon">
+                🔥
+              </span>
             </div>
 
             <div className="stat-value">
-              <strong>{consistency.currentStreak}</strong>
+              <strong>
+                {consistency.currentStreak}
+              </strong>
+
               <span>days</span>
             </div>
 
             <div className="streak-bars">
-              {[...consistency.lastSevenDays].reverse().map(
-                (completed, index) => (
-                  <span
-                    key={index}
-                    className={
-                      completed ? 'completed' : ''
-                    }
-                  />
-                )
-              )}
+              {[
+                ...consistency.lastSevenDays,
+              ]
+                .reverse()
+                .map(
+                  (completed, index) => (
+                    <span
+                      key={index}
+                      className={
+                        completed
+                          ? 'completed'
+                          : ''
+                      }
+                    />
+                  )
+                )}
             </div>
 
             <span className="stat-footer">
@@ -460,10 +507,13 @@ export default function Home({ onAlarmStart }) {
             <div className="sleep-header">
               <div className="status-badge">
                 <span className="status-dot" />
-                Protocol Status // Optimal Sleep Window
+                Protocol Status // Optimal Sleep
+                Window
               </div>
 
-              <span className="stat-icon">☾</span>
+              <span className="stat-icon">
+                ☾
+              </span>
             </div>
 
             <div className="sleep-main">
@@ -476,16 +526,21 @@ export default function Home({ onAlarmStart }) {
                       <strong>
                         {targetSleep.time}
                       </strong>
+
                       <b>
                         {targetSleep.period}
                       </b>
                     </>
                   ) : (
-                    <strong>--:--</strong>
+                    <strong>
+                      --:--
+                    </strong>
                   )}
                 </div>
 
-                <p>8h calculated rest cycle</p>
+                <p>
+                  8h calculated rest cycle
+                </p>
               </div>
 
               <div className="sleep-icon-box">

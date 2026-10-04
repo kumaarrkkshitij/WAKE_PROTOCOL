@@ -1,4 +1,8 @@
 import { useEffect, useState } from 'react'
+import {
+  createAlarm,
+  updateAlarm,
+} from '../api/index.js'
 import { saveAlarmMusic } from '../utils/alarmMusic'
 
 const days = [
@@ -129,26 +133,8 @@ export default function AlarmForm({
       }
 
       if (mode === 'create') {
-        const response = await fetch(
-          'http://localhost:3000/api/alarms',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type':
-                'application/json',
-            },
-            body: JSON.stringify(alarmData),
-          }
-        )
-
-        if (!response.ok) {
-          throw new Error(
-            'Failed to create alarm'
-          )
-        }
-
         const savedAlarm =
-          await response.json()
+          await createAlarm(alarmData)
 
         if (musicFile) {
           await saveAlarmMusic(
@@ -166,26 +152,11 @@ export default function AlarmForm({
         return
       }
 
-      const response = await fetch(
-        `http://localhost:3000/api/alarms/${alarm.id}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type':
-              'application/json',
-          },
-          body: JSON.stringify(alarmData),
-        }
-      )
-
-      if (!response.ok) {
-        throw new Error(
-          'Failed to update alarm'
-        )
-      }
-
       const updatedAlarm =
-        await response.json()
+        await updateAlarm(
+          alarm.id,
+          alarmData
+        )
 
       if (musicFile) {
         await saveAlarmMusic(
