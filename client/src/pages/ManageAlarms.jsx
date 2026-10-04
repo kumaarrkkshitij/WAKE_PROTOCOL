@@ -6,24 +6,123 @@ import {
 } from '../api/index.js'
 import { deleteAlarmMusic } from '../utils/alarmMusic'
 
+const dayKeys = ['SU', 'M', 'T', 'W', 'TH', 'F', 'SA']
+
+function getNextAlarm(alarmList) {
+  const now = new Date()
+  const currentDay = now.getDay()
+  const currentMinutes =
+    now.getHours() * 60 + now.getMinutes()
+
+  const candidates = []
+
+  alarmList
+    .filter((alarm) => alarm.enabled)
+    .forEach((alarm) => {
+      const [hours, minutes] =
+        alarm.time.split(':').map(Number)
+
+      let hour24 = hours
+
+      if (alarm.period === 'AM') {
+        hour24 = hours === 12 ? 0 : hours
+      } else {
+        hour24 =
+          hours === 12 ? 12 : hours + 12
+      }
+
+      const alarmMinutes =
+        hour24 * 60 + minutes
+
+      const repeatDays =
+        alarm.repeat_days || []
+
+      for (let offset = 0; offset < 7; offset++) {
+        const targetDay =
+          (currentDay + offset) % 7
+
+        const targetDayKey =
+          dayKeys[targetDay]
+
+        if (!repeatDays.includes(targetDayKey)) {
+          continue
+        }
+
+        if (
+          offset === 0 &&
+          alarmMinutes <= currentMinutes
+        ) {
+          continue
+        }
+
+        candidates.push({
+          alarm,
+          minutesUntil:
+            offset * 24 * 60 +
+            alarmMinutes -
+            currentMinutes,
+        })
+
+        break
+      }
+    })
+
+  candidates.sort(
+    (a, b) => a.minutesUntil - b.minutesUntil
+  )
+
+  return candidates[0] || null
+}
+
+function formatNextAlarm(minutesUntil) {
+  if (minutesUntil === null) {
+    return null
+  }
+
+  const days = Math.floor(
+    minutesUntil / (24 * 60)
+  )
+
+  const hours = Math.floor(
+    (minutesUntil % (24 * 60)) / 60
+  )
+
+  const minutes = minutesUntil % 60
+
+  if (days > 0) {
+    return `${days}d ${hours}h`
+  }
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`
+  }
+
+  return `${minutes}m`
+}
+
 export default function ManageAlarms({ onCreate, onEdit }) {
   const [alarms, setAlarms] = useState([])
   const [filter, setFilter] = useState('all')
-  const [currentTime, setCurrentTime] = useState(new Date())
+  const [currentTime, setCurrentTime] =
+    useState(new Date())
 
   useEffect(() => {
     listAlarms()
       .then((data) => {
         const mappedAlarms = data.map((alarm) => ({
           ...alarm,
-          days: alarm.repeat_days?.join(', ') || '',
+          days:
+            alarm.repeat_days?.join(', ') || '',
           challenge: alarm.challenge_type,
         }))
 
         setAlarms(mappedAlarms)
       })
       .catch((error) => {
-        console.error('Failed to load alarms:', error)
+        console.error(
+          'Failed to load alarms:',
+          error
+        )
       })
   }, [])
 
@@ -36,22 +135,29 @@ export default function ManageAlarms({ onCreate, onEdit }) {
   }, [])
 
   const toggleAlarm = async (id) => {
-    const alarm = alarms.find((item) => item.id === id)
+    const alarm = alarms.find(
+      (item) => item.id === id
+    )
 
     if (!alarm) return
 
     const updatedEnabled = !alarm.enabled
 
     try {
-      const updatedAlarm = await updateAlarm(id, {
-        time: alarm.time,
-        period: alarm.period,
-        name: alarm.name,
-        repeat_days: alarm.repeat_days || [],
-        challenge_type: alarm.challenge_type,
-        music: alarm.music || '',
-        enabled: updatedEnabled,
-      })
+      const updatedAlarm = await updateAlarm(
+        id,
+        {
+          time: alarm.time,
+          period: alarm.period,
+          name: alarm.name,
+          repeat_days:
+            alarm.repeat_days || [],
+          challenge_type:
+            alarm.challenge_type,
+          music: alarm.music || '',
+          enabled: updatedEnabled,
+        }
+      )
 
       setAlarms((currentAlarms) =>
         currentAlarms.map((item) =>
@@ -60,14 +166,20 @@ export default function ManageAlarms({ onCreate, onEdit }) {
                 ...item,
                 ...updatedAlarm,
                 days:
-                  updatedAlarm.repeat_days?.join(', ') || '',
-                challenge: updatedAlarm.challenge_type,
+                  updatedAlarm.repeat_days?.join(
+                    ', '
+                  ) || '',
+                challenge:
+                  updatedAlarm.challenge_type,
               }
             : item
         )
       )
     } catch (error) {
-      console.error('Failed to toggle alarm:', error)
+      console.error(
+        'Failed to toggle alarm:',
+        error
+      )
     }
   }
 
@@ -83,72 +195,89 @@ export default function ManageAlarms({ onCreate, onEdit }) {
         )
       )
     } catch (error) {
-      console.error('Failed to delete alarm:', error)
+      console.error(
+        'Failed to delete alarm:',
+        error
+      )
     }
   }
 
-  const filteredAlarms = alarms.filter((alarm) => {
-    if (filter === 'all') return true
+  const filteredAlarms = alarms.filter(
+    (alarm) => {
+      if (filter === 'all') return true
 
-    if (filter === 'inactive') {
-      return !alarm.enabled
-    }
-
-    const repeatDays = alarm.repeat_days || []
-
-    if (filter === 'workdays') {
-      const workdays = [
-        'M',
-        'T',
-        'W',
-        'TH',
-        'F',
-      ]
-
-      return repeatDays.some((day) =>
-        workdays.includes(day)
-      )
-    }
-
-    if (filter === 'weekend') {
-      const weekend = ['SA', 'SU']
-
-      return repeatDays.some((day) =>
-        weekend.includes(day)
-      )
-    }
-
-    return true
-  })
-
-  const sortedAlarms = [...filteredAlarms].sort(
-    (a, b) => {
-      const toMinutes = (alarm) => {
-        const [hours, minutes] =
-          alarm.time.split(':').map(Number)
-
-        let hour24 = hours
-
-        if (alarm.period === 'AM') {
-          hour24 = hours === 12 ? 0 : hours
-        } else {
-          hour24 =
-            hours === 12 ? 12 : hours + 12
-        }
-
-        return hour24 * 60 + minutes
+      if (filter === 'inactive') {
+        return !alarm.enabled
       }
 
-      return toMinutes(a) - toMinutes(b)
+      const repeatDays =
+        alarm.repeat_days || []
+
+      if (filter === 'workdays') {
+        const workdays = [
+          'M',
+          'T',
+          'W',
+          'TH',
+          'F',
+        ]
+
+        return repeatDays.some((day) =>
+          workdays.includes(day)
+        )
+      }
+
+      if (filter === 'weekend') {
+        const weekend = ['SA', 'SU']
+
+        return repeatDays.some((day) =>
+          weekend.includes(day)
+        )
+      }
+
+      return true
     }
   )
+
+  const sortedAlarms = [
+    ...filteredAlarms,
+  ].sort((a, b) => {
+    const toMinutes = (alarm) => {
+      const [hours, minutes] =
+        alarm.time.split(':').map(Number)
+
+      let hour24 = hours
+
+      if (alarm.period === 'AM') {
+        hour24 =
+          hours === 12 ? 0 : hours
+      } else {
+        hour24 =
+          hours === 12 ? 12 : hours + 12
+      }
+
+      return hour24 * 60 + minutes
+    }
+
+    return toMinutes(a) - toMinutes(b)
+  })
+
+  const nextAlarm = getNextAlarm(alarms)
+
+  const nextAlarmText = nextAlarm
+    ? formatNextAlarm(
+        nextAlarm.minutesUntil
+      )
+    : null
 
   return (
     <>
       {/* Same Header as Home */}
       <header className="top-bar">
         <div className="brand">
-          <div className="wake-logo">W</div>
+          <div className="wake-logo">
+            W
+          </div>
 
           <div className="brand-text">
             <span className="protocol-label">
@@ -191,7 +320,10 @@ export default function ManageAlarms({ onCreate, onEdit }) {
             <div>
               <div className="next-alarm-label">
                 <span className="status-dot" />
-                Next Alarm in 7h 14m
+
+                {nextAlarm
+                  ? `Next Alarm in ${nextAlarmText}`
+                  : 'No Active Alarms'}
               </div>
 
               <h2>Active Protocol</h2>
@@ -208,7 +340,10 @@ export default function ManageAlarms({ onCreate, onEdit }) {
           {/* Filters */}
           <div className="filter-bar">
             {[
-              ['all', `All (${alarms.length})`],
+              [
+                'all',
+                `All (${alarms.length})`,
+              ],
               ['workdays', 'Workdays'],
               ['weekend', 'Weekend'],
               [
@@ -223,9 +358,13 @@ export default function ManageAlarms({ onCreate, onEdit }) {
               <button
                 key={value}
                 className={`filter-chip ${
-                  filter === value ? 'active' : ''
+                  filter === value
+                    ? 'active'
+                    : ''
                 }`}
-                onClick={() => setFilter(value)}
+                onClick={() =>
+                  setFilter(value)
+                }
               >
                 {label}
               </button>
@@ -237,7 +376,9 @@ export default function ManageAlarms({ onCreate, onEdit }) {
             {sortedAlarms.map((alarm) => (
               <section
                 className={`manage-alarm-card ${
-                  !alarm.enabled ? 'inactive' : ''
+                  !alarm.enabled
+                    ? 'inactive'
+                    : ''
                 }`}
                 key={alarm.id}
               >
@@ -245,7 +386,9 @@ export default function ManageAlarms({ onCreate, onEdit }) {
                   <div>
                     <div className="manage-alarm-time">
                       {alarm.time}
-                      <span>{alarm.period}</span>
+                      <span>
+                        {alarm.period}
+                      </span>
                     </div>
 
                     <div className="manage-alarm-name">
@@ -259,13 +402,17 @@ export default function ManageAlarms({ onCreate, onEdit }) {
 
                   <button
                     className={`alarm-toggle ${
-                      alarm.enabled ? 'active' : ''
+                      alarm.enabled
+                        ? 'active'
+                        : ''
                     }`}
                     onClick={() =>
                       toggleAlarm(alarm.id)
                     }
                     aria-label="Toggle alarm"
-                    aria-pressed={alarm.enabled}
+                    aria-pressed={
+                      alarm.enabled
+                    }
                   >
                     <span />
                   </button>
