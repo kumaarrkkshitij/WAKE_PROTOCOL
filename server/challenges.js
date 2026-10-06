@@ -1,7 +1,4 @@
-// WAKE Protocol challenge bank
-// Math: 400 easy mental-arithmetic challenges
-// Typing: 400 original morning/reflection challenges
-
+// Math challenge bank
 export const mathChallenges = [
     { question: '7 + 5', answer: 12 },
     { question: '14 + 6', answer: 20 },
@@ -469,6 +466,7 @@ export const mathChallenges = [
     { question: '47 + 26', answer: 73 },
   ]
   
+  // Typing challenge bank
   export const typingChallenges = [
     'Wake up and remember that today is still unwritten.',
     'You are here, and that is already worth being grateful for.',

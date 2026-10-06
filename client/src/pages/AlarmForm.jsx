@@ -5,6 +5,7 @@ import {
 } from '../api/index.js'
 import { saveAlarmMusic } from '../utils/alarmMusic'
 
+// Days of week configuration
 const days = [
   { key: 'M', label: 'M' },
   { key: 'T', label: 'T' },
@@ -59,6 +60,7 @@ export default function AlarmForm({
   const [currentTime, setCurrentTime] =
     useState(new Date())
 
+  // Sync form state when selected alarm updates
   useEffect(() => {
     if (!alarm) {
       return
@@ -93,6 +95,7 @@ export default function AlarmForm({
     setMusicFile(null)
   }, [alarm])
 
+  // Update live clock every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date())
@@ -101,6 +104,7 @@ export default function AlarmForm({
     return () => clearInterval(timer)
   }, [])
 
+  // Toggle repeat day selection
   const toggleDay = (day) => {
     setRepeatDays((current) =>
       current.includes(day)
@@ -111,6 +115,7 @@ export default function AlarmForm({
     )
   }
 
+  // Handle local audio file selection
   const handleMusicChange = (event) => {
     const file = event.target.files[0]
 
@@ -120,6 +125,7 @@ export default function AlarmForm({
     }
   }
 
+  // Save alarm configuration to API
   const handleSave = async () => {
     try {
       const alarmData = {
@@ -179,6 +185,7 @@ export default function AlarmForm({
     }
   }
 
+  // Format current display time
   const formattedCurrentTime =
     currentTime.toLocaleTimeString([], {
       hour: 'numeric',

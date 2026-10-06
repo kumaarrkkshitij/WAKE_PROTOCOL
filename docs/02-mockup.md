@@ -19,7 +19,7 @@ The Home screen is the main dashboard of WAKE Protocol. It allows the user to qu
 * Automatic alarm triggering when a scheduled alarm is reached
 * Bottom navigation
 
-![WAKE Protocol Home screen](assets/mockup-home.png)
+![WAKE Protocol Home screen](assets/home.png)
 
 ---
 
@@ -49,13 +49,13 @@ The original wireframe included separate Edit and Delete controls for managing a
 
 The Create Alarm action remains available from the Manage Alarms screen.
 
-![WAKE Protocol Manage Alarms screen](assets/mockup-manage-alarms.png)
+![WAKE Protocol Manage Alarms screen](assets/manage-alarms.png)
 
 ### Empty State
 
 When no alarms have been created, Manage Alarms displays an empty state instead of an alarm list. The user is provided with a clear way to create their first alarm.
 
-![WAKE Protocol Manage Alarms empty state](assets/mockup-manage-alarms-empty.png)
+![WAKE Protocol Manage Alarms empty state](assets/manage-alarms.png)
 
 ---
 
@@ -79,7 +79,7 @@ The Create Alarm screen allows the user to configure and save a new alarm.
 
 The selected audio file is stored locally in the browser using IndexedDB. The audio itself is not uploaded to the backend.
 
-![WAKE Protocol Create Alarm screen](assets/mockup-create-alarm.png)
+![WAKE Protocol Create Alarm screen](assets/create-alarm.png)
 
 ---
 
@@ -106,7 +106,7 @@ The original wireframe showed Edit as a management action for an existing alarm.
 
 The Edit Alarm screen itself remains focused on changing the alarm's configuration rather than providing separate delete controls.
 
-![WAKE Protocol Edit Alarm screen](assets/mockup-edit-alarm.png)
+![WAKE Protocol Edit Alarm screen](assets/create-alarm.png)
 
 ---
 
@@ -135,7 +135,7 @@ After successful completion, the alarm workflow finishes and the user returns to
 
 If the alarm music finishes before the required challenge is completed, the alarm is recorded as missed.
 
-![WAKE Protocol Active Alarm screen](assets/mockup-active-alarm.png)
+![WAKE Protocol Active Alarm screen](assets/active-math.png)
 
 ---
 
@@ -154,7 +154,7 @@ The finalized application uses a compact phone layout with:
 * Blue accent elements
 * Clear alarm and challenge status indicators
 
-![WAKE Protocol mobile presentation](assets/mockup-mobile.png)
+![WAKE Protocol mobile presentation](assets/home.png)
 
 ---
 
@@ -247,20 +247,18 @@ The mockup therefore reflects the application that was actually built and deploy
 
 ## 11. Assets
 
-The exported mockup screenshots are stored in the repository under:
+The exported application screenshots are stored in the repository under:
 
 ```text
-assets/
-├── mockup-home.png
-├── mockup-manage-alarms.png
-├── mockup-manage-alarms-empty.png
-├── mockup-create-alarm.png
-├── mockup-edit-alarm.png
-├── mockup-active-alarm.png
-└── mockup-mobile.png
+docs/assets/
+├── home.png
+├── manage-alarms.png
+├── create-alarm.png
+├── active-math.png
+└── active-typing.png
 ```
 
-The images above are referenced directly by this document using relative Markdown paths. Once the corresponding files are placed in `assets/`, GitHub will automatically display them here without requiring any further changes to `mockup.md`.
+The images above are referenced directly by this document using relative Markdown paths. Once the corresponding files are placed in `docs/assets/`, GitHub will automatically display them here without requiring any further changes to `02-mockup.md`.
 
 ---
 

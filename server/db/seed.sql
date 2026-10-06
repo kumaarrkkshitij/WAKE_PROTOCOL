@@ -1,9 +1,4 @@
--- Sample data for development.
---
--- This starts with TRUNCATE. That is correct on your laptop and catastrophic
--- against the database your live demo depends on. Check which DATABASE_URL is
--- loaded before you run it.
-
+-- Seed database with sample data
 TRUNCATE TABLE sightings RESTART IDENTITY CASCADE;
 
 INSERT INTO sightings (place, description, spookiness, reported_at) VALUES

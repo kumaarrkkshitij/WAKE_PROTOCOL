@@ -2,7 +2,8 @@
 
 Three to five minutes, screen recorded, your own voice. Nobody watches ten.
 
-**Link:** (paste it here, and in the main README)
+**Demo Video Link:** [Watch Demo Video](https://drive.google.com/file/d/1u1zSQEoz100tsThk0LCkOj0PRXYvQbjs/view?usp=sharing)  
+**PPT & Presentation Resources:** [View Presentation & Resources](https://drive.google.com/drive/folders/1Z3FKXqXcQdL4C_9v0Fm5ip3hmv3RkaOU?usp=sharing)
 
 ## The structure that always works
 

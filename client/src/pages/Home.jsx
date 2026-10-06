@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { listAlarms } from '../api/index.js'
 
+// Day keys lookup table
 const dayKeys = ['SU', 'M', 'T', 'W', 'TH', 'F', 'SA']
 
+// Format local date string (YYYY-MM-DD)
 function getLocalDateKey(date = new Date()) {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -11,7 +13,8 @@ function getLocalDateKey(date = new Date()) {
   return `${year}-${month}-${day}`
 }
 
-function getConsistencyData() {
+// Calculate streak and consistency metrics
+function getConsistencyData(alarms = []) {
   const stored =
     JSON.parse(localStorage.getItem('wakeConsistency')) || {}
 
@@ -24,8 +27,19 @@ function getConsistencyData() {
     date.setDate(today.getDate() - offset)
 
     const dateKey = getLocalDateKey(date)
+    const dayKey = dayKeys[date.getDay()]
 
-    if (stored[dateKey] === 'completed') {
+    const hasEnabledAlarm = alarms.some(
+      (alarm) =>
+        alarm.enabled &&
+        (alarm.repeat_days || []).includes(dayKey)
+    )
+
+    const isLit =
+      stored[dateKey] === 'completed' ||
+      (!stored[dateKey] && !hasEnabledAlarm)
+
+    if (isLit) {
       currentStreak++
     } else {
       break
@@ -53,10 +67,19 @@ function getConsistencyData() {
     date.setDate(today.getDate() - offset)
 
     const dateKey = getLocalDateKey(date)
+    const dayKey = dayKeys[date.getDay()]
 
-    lastSevenDays.push(
-      stored[dateKey] === 'completed'
+    const hasEnabledAlarm = alarms.some(
+      (alarm) =>
+        alarm.enabled &&
+        (alarm.repeat_days || []).includes(dayKey)
     )
+
+    const isLit =
+      stored[dateKey] === 'completed' ||
+      (!stored[dateKey] && !hasEnabledAlarm)
+
+    lastSevenDays.push(isLit)
   }
 
   return {
@@ -66,6 +89,7 @@ function getConsistencyData() {
   }
 }
 
+// Calculate the next scheduled alarm
 function getNextAlarm(alarmList) {
   const now = new Date()
   const currentDay = now.getDay()
@@ -129,6 +153,7 @@ function getNextAlarm(alarmList) {
   return candidates[0] || null
 }
 
+// Calculate recommended sleep window
 function getTargetSleep(nextAlarm) {
   if (!nextAlarm) {
     return null
@@ -173,6 +198,7 @@ function getTargetSleep(nextAlarm) {
   }
 }
 
+// Format repeat days for display
 function formatRepeatDays(repeatDays) {
   if (!repeatDays || repeatDays.length === 0) {
     return 'No repeat days'
@@ -210,10 +236,12 @@ export default function Home({ onAlarmStart }) {
     ) || null
   )
 
+  // Load alarms from the API
   useEffect(() => {
     listAlarms()
       .then((data) => {
         setAlarms(data)
+        setConsistency(getConsistencyData(data))
       })
       .catch((error) => {
         console.error(
@@ -226,6 +254,7 @@ export default function Home({ onAlarmStart }) {
       })
   }, [])
 
+  // Update live clock every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date())
@@ -234,9 +263,10 @@ export default function Home({ onAlarmStart }) {
     return () => clearInterval(timer)
   }, [])
 
+  // Sync consistency state on storage update
   useEffect(() => {
     const updateConsistency = () => {
-      setConsistency(getConsistencyData())
+      setConsistency(getConsistencyData(alarms))
     }
 
     window.addEventListener(
@@ -260,8 +290,9 @@ export default function Home({ onAlarmStart }) {
         updateConsistency
       )
     }
-  }, [])
+  }, [alarms])
 
+  // Check for active alarm trigger match
   useEffect(() => {
     if (!alarms.length) {
       return
@@ -478,22 +509,18 @@ export default function Home({ onAlarmStart }) {
             </div>
 
             <div className="streak-bars">
-              {[
-                ...consistency.lastSevenDays,
-              ]
-                .reverse()
-                .map(
-                  (completed, index) => (
-                    <span
-                      key={index}
-                      className={
-                        completed
-                          ? 'completed'
-                          : ''
-                      }
-                    />
-                  )
-                )}
+              {consistency.lastSevenDays.map(
+                (completed, index) => (
+                  <span
+                    key={index}
+                    className={
+                      completed
+                        ? 'completed'
+                        : ''
+                    }
+                  />
+                )
+              )}
             </div>
 
             <span className="stat-footer">

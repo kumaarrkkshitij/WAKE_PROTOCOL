@@ -1,7 +1,8 @@
-// The real client. Every function here talks to YOUR Express API.
+// HTTP client for backend API communication
 
 const BASE = import.meta.env.VITE_API_BASE_URL || ''
 
+// Send HTTP request to backend
 async function request(path, options) {
   const response = await fetch(`${BASE}${path}`, {
     headers: { 'Content-Type': 'application/json' },
@@ -15,7 +16,6 @@ async function request(path, options) {
       const body = await response.json()
       if (body?.error) message = body.error
     } catch {
-      // The body was not JSON.
     }
 
     throw new Error(message)
@@ -24,7 +24,7 @@ async function request(path, options) {
   return response.status === 204 ? null : response.json()
 }
 
-// ─── Alarms ───────────────────────────────────────────────
+// Alarm API endpoints
 
 export const listAlarms = () =>
   request('/api/alarms')
@@ -49,7 +49,7 @@ export const deleteAlarm = (id) =>
     method: 'DELETE',
   })
 
-// ─── Challenges ────────────────────────────────────────────
+// Challenge API endpoints
 
 export const getMathChallenge = () =>
   request('/api/challenges/math')

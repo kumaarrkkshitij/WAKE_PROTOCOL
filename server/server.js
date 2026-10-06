@@ -8,12 +8,7 @@ import { mathChallenges, typingChallenges } from './challenges.js'
 
 const app = express()
 
-// CORS before the routes. Middleware registered after a route never sees that
-// route's requests, which is the m4 lesson showing up in production.
-//
-// Name your origins. app.use(cors()) with no options sends
-// Access-Control-Allow-Origin: *, which lets any site on the internet call this
-// API from a visitor's browser, and is incompatible with cookies.
+// Configure middleware
 const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173')
   .split(',')
   .map((origin) => origin.trim())
@@ -23,13 +18,12 @@ app.use(cors({ origin: allowedOrigins }))
 app.use(helmet())
 app.use(express.json({ limit: '100kb' }))
 
-// Is the process alive?
+// Check server health
 app.get('/healthz', (request, response) => {
   response.json({ ok: true })
 })
 
-// Is the database reachable? A different question, and the one that tells you
-// in two seconds which half of a problem you have.
+// Check database connectivity
 app.get('/readyz', async (request, response) => {
   try {
     await pool.query('SELECT 1')
@@ -40,6 +34,7 @@ app.get('/readyz', async (request, response) => {
   }
 })
 
+// Get random math challenge
 app.get('/api/challenges/math', (request, response) => {
   const challenge =
     mathChallenges[Math.floor(Math.random() * mathChallenges.length)]
@@ -47,6 +42,7 @@ app.get('/api/challenges/math', (request, response) => {
   response.json(challenge)
 })
 
+// Get random typing challenge
 app.get('/api/challenges/typing', (request, response) => {
   const phrase =
     typingChallenges[Math.floor(Math.random() * typingChallenges.length)]
@@ -54,6 +50,7 @@ app.get('/api/challenges/typing', (request, response) => {
   response.json({ phrase })
 })
 
+// Fetch all alarms
 app.get('/api/alarms', async (request, response, next) => {
   try {
     response.json(await alarms.getAll(pool))
@@ -62,6 +59,7 @@ app.get('/api/alarms', async (request, response, next) => {
   }
 })
 
+// Fetch alarm by ID
 app.get('/api/alarms/:id', async (request, response, next) => {
   try {
     const alarm = await alarms.getById(pool, request.params.id)
@@ -76,18 +74,19 @@ app.get('/api/alarms/:id', async (request, response, next) => {
   }
 })
 
+// Fetch all math challenges
 app.get('/api/challenges/math/all', (request, response) => {
   response.json(mathChallenges)
 })
 
+// Fetch all typing challenges
 app.get('/api/challenges/typing/all', (request, response) => {
   response.json(
     typingChallenges.map((phrase) => ({ phrase }))
   )
 })
 
-// Validation lives on the server because the client can be bypassed. The
-// browser form is for a fast, friendly message; this is for correctness.
+// Validate alarm request data
 function validate(body) {
   const errors = []
 
@@ -137,6 +136,7 @@ function validate(body) {
   }
 }
 
+// Create a new alarm
 app.post('/api/alarms', async (request, response, next) => {
   const { errors, value } = validate(request.body ?? {})
 
@@ -154,6 +154,7 @@ app.post('/api/alarms', async (request, response, next) => {
   }
 })
 
+// Update an existing alarm
 app.put('/api/alarms/:id', async (request, response, next) => {
   const { errors, value } = validate(request.body ?? {})
 
@@ -176,6 +177,7 @@ app.put('/api/alarms/:id', async (request, response, next) => {
   }
 })
 
+// Delete an alarm
 app.delete('/api/alarms/:id', async (request, response, next) => {
   try {
     const removed = await alarms.remove(pool, request.params.id)
@@ -190,20 +192,18 @@ app.delete('/api/alarms/:id', async (request, response, next) => {
   }
 })
 
-// 404 handler comes after the routes
+// Handle 404 routes
 app.use((request, response) => {
   response.status(404).json({ error: 'No such route' })
 })
 
-// The detail goes in your logs; the visitor gets a plain message. Sending a
-// stack trace to a stranger tells them about your file layout and dependencies.
+// Handle global errors
 app.use((error, request, response, next) => {
   console.error(error)
   response.status(500).json({ error: 'Something went wrong on the server' })
 })
 
-// The host chooses the port and tells you through PORT. Hardcoding 3000 is the
-// commonest reason a first deploy is marked unhealthy and killed.
+// Start server
 const port = process.env.PORT || 3000
 
 app.listen(port, () => {

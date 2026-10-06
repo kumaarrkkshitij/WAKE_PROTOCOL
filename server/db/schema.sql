@@ -1,11 +1,4 @@
--- The complete shape of the database. Safe to run against an empty database,
--- and safe to run twice.
---
--- This file is committed on purpose. Your schema is a fact about your
--- application, not a runtime concern: it should be readable by opening a file
--- rather than by connecting to a server. It is also what lets you move to a
--- hosted database in one command.
-
+-- Define alarms table schema
 CREATE TABLE IF NOT EXISTS alarms (
   id             SERIAL PRIMARY KEY,
   time           TEXT        NOT NULL,
@@ -18,6 +11,6 @@ CREATE TABLE IF NOT EXISTS alarms (
   created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Helps queries that filter alarms by their enabled/disabled state.
+-- Index for filtering alarms by status
 CREATE INDEX IF NOT EXISTS alarms_enabled_idx
   ON alarms (enabled);

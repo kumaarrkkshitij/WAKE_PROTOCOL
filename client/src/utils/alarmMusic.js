@@ -2,6 +2,7 @@ const DB_NAME = 'wakeProtocolDB'
 const DB_VERSION = 1
 const STORE_NAME = 'alarmMusic'
 
+// Open IndexedDB database for alarm audio storage
 function openDatabase() {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION)
@@ -24,6 +25,7 @@ function openDatabase() {
   })
 }
 
+// Save custom alarm music file
 export async function saveAlarmMusic(alarmId, file) {
   const db = await openDatabase()
 
@@ -49,6 +51,7 @@ export async function saveAlarmMusic(alarmId, file) {
   })
 }
 
+// Retrieve custom alarm music file
 export async function getAlarmMusic(alarmId) {
   const db = await openDatabase()
 
@@ -73,6 +76,7 @@ export async function getAlarmMusic(alarmId) {
   })
 }
 
+// Delete custom alarm music file
 export async function deleteAlarmMusic(alarmId) {
   const db = await openDatabase()
 

@@ -8,11 +8,12 @@ WAKE Protocol transforms the traditional alarm experience by combining automated
 **Live site:** [Deployed on GitHub Pages](https://kumaarrkkshitij.github.io/WAKE_PROTOCOL/)  
 **API:** [Hosted on Render](https://wake-protocol-api.onrender.com)  
 **Database:** PostgreSQL on Render  
-**Demo video:** Available upon request / Submission package  
+**Demo video:** [Watch Demo Video](https://drive.google.com/file/d/1u1zSQEoz100tsThk0LCkOj0PRXYvQbjs/view?usp=sharing)  
+**Presentation & Resources:** [View Presentation (PPT) & Resources](https://drive.google.com/drive/folders/1Z3FKXqXcQdL4C_9v0Fm5ip3hmv3RkaOU?usp=sharing)  
 
 > **Current development status:** Completed full-stack application. The React/Vite frontend communicates with an Express REST API backed by a PostgreSQL database, with full support for local fallback demo mode.
 
-![A screenshot of the main screen](docs/assets/screenshot.png)
+![WAKE Protocol Home Screen](docs/assets/home.png)
 
 ---
 
@@ -143,40 +144,78 @@ GitHub Pages serves static assets, so the API and database run on Render:
 
 ---
 
-## Running it yourself
+## Setup and installation
 
-### Option 1: Client only (Demo Mode)
-No database or backend server required.
+### Requirements
+- **Node.js** v20 or later
+- **PostgreSQL** 16 or later (for full stack — not needed in demo mode)
 
+### Clone
 ```bash
-cd client
-npm install
-# VITE_USE_MOCK_API defaults to true when unset, or create client/.env with VITE_USE_MOCK_API=true
-npm run dev                 # http://localhost:5173
+git clone https://github.com/kumaarrkkshitij/WAKE_PROTOCOL.git
+cd WAKE_PROTOCOL
 ```
 
-### Option 2: Full Stack (Local Development)
-Requires a PostgreSQL instance (local or Docker), Express server, and React client.
-
+### Option A — Client only (demo mode, no database needed)
 ```bash
-# 1. Start PostgreSQL (e.g. via Docker)
-docker run --name wake-pg -e POSTGRES_PASSWORD=devpassword \
-  -e POSTGRES_DB=wake_protocol -p 5432:5432 -d postgres:17
-
-# 2. Start the Express API Server
-cd server
-npm install
-# Create server/.env with DATABASE_URL=postgres://postgres:devpassword@localhost:5432/wake_protocol
-npm run db:reset            # Runs npm run db:schema && npm run db:seed
-npm run dev                 # Runs node --env-file=.env --watch server.js on http://localhost:3000
-
-# 3. Start the React Frontend Client (in another terminal)
 cd client
 npm install
-# Create client/.env with:
-# VITE_USE_MOCK_API=false
-# VITE_API_BASE_URL=http://localhost:3000
-npm run dev                 # Runs client on http://localhost:5173
+cp .env.example .env    # VITE_USE_MOCK_API=true by default
+npm run dev             # http://localhost:5173
+```
+Data is saved to `localStorage` in your browser. Nothing is sent to a server.
+
+### Option B — Full stack (Express + PostgreSQL)
+
+#### 1. Database
+Create a local PostgreSQL database:
+```bash
+psql -U postgres -c "CREATE DATABASE wake_protocol;"
+```
+
+#### 2. Server
+```bash
+cd server
+npm install
+cp .env.example .env
+```
+Edit `server/.env`:
+```env
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/wake_protocol
+CORS_ORIGINS=http://localhost:5173
+NODE_ENV=development
+```
+Create the tables and load sample data:
+```bash
+npm run db:reset    # runs schema.sql then seed.sql
+```
+
+#### 3. Client
+```bash
+cd ../client
+npm install
+cp .env.example .env
+```
+Edit `client/.env`:
+```env
+VITE_USE_MOCK_API=false
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+### Running locally
+
+**API server (in `server/`):**
+```bash
+npm run dev
+# Listening on http://localhost:3000
+# GET /healthz  →  { "ok": true }
+# GET /readyz   →  { "ok": true, "db": "up" }
+```
+
+**Frontend (in `client/`):**
+```bash
+npm run dev
+# Open http://localhost:5173
 ```
 
 ### Verification Commands

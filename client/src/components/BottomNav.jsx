@@ -1,3 +1,4 @@
+// Render bottom navigation bar
 export default function BottomNav({ page, onNavigate }) {
     return (
       <nav className="bottom-nav">

@@ -5,6 +5,7 @@ import {
 } from '../api'
 import { getAlarmMusic } from '../utils/alarmMusic'
 
+// Save daily alarm consistency result
 function saveConsistencyResult(result) {
   const today = new Date()
 
@@ -29,6 +30,7 @@ function saveConsistencyResult(result) {
   )
 }
 
+// Generate unique challenge key
 function getChallengeKey(challenge, isTyping) {
   if (!challenge) {
     return ''
@@ -39,6 +41,7 @@ function getChallengeKey(challenge, isTyping) {
     : `${challenge.question}|${challenge.answer}`
 }
 
+// Shuffle challenge items
 function shuffleArray(items) {
   const shuffled = [...items]
 
@@ -72,6 +75,7 @@ export default function ActiveAlarm({
 
   const isTyping = challengeType === 'Typing'
 
+  // Handle alarm audio track end event
   const handleAudioEnded = () => {
     if (completed) {
       return
@@ -81,6 +85,7 @@ export default function ActiveAlarm({
     onDismiss?.()
   }
 
+  // Load active challenge from pool
   useEffect(() => {
     let cancelled = false
 
@@ -130,10 +135,7 @@ export default function ActiveAlarm({
           challengePool = []
         }
 
-        /*
-         * Load the complete 400-question pool if it
-         * is not already available in this session.
-         */
+        // Load challenge pool into session storage
         if (challengePool.length === 0) {
           challengePool = isTyping
             ? await getAllTypingChallenges()
@@ -147,10 +149,7 @@ export default function ActiveAlarm({
           )
         }
 
-        /*
-         * Find the first challenge from the shuffled
-         * pool that this alarm has not used yet.
-         */
+        // Select next unused challenge from pool
         const usedSet = new Set(usedChallenges)
 
         let nextChallenge = null
@@ -172,10 +171,7 @@ export default function ActiveAlarm({
           }
         }
 
-        /*
-         * If this alarm has already used every challenge,
-         * start a new shuffled cycle.
-         */
+        // Reset cycle when all challenges have been used
         if (!nextChallenge) {
           challengePool = shuffleArray(challengePool)
 
@@ -204,11 +200,7 @@ export default function ActiveAlarm({
             JSON.stringify(usedChallenges)
           )
 
-          /*
-           * Move the selected challenge to the end
-           * of the pool. This keeps the remaining
-           * challenges available for future alarms.
-           */
+          // Rotate selected challenge to end of pool
           if (nextIndex > -1) {
             const selected =
               challengePool.splice(nextIndex, 1)[0]
@@ -246,6 +238,7 @@ export default function ActiveAlarm({
     }
   }, [isTyping, alarm?.id])
 
+  // Load and play selected alarm music
   useEffect(() => {
     let cancelled = false
 
@@ -312,6 +305,7 @@ export default function ActiveAlarm({
     }
   }, [alarm?.id])
 
+  // Handle auto-dismiss timer upon completion
   useEffect(() => {
     if (!completed) {
       return
@@ -324,18 +318,21 @@ export default function ActiveAlarm({
     return () => clearTimeout(timer)
   }, [completed, onDismiss])
 
+  // Handle keypad numeric entry
   const handleKey = (value) => {
     setAnswer((current) =>
       `${current}${value}`.slice(0, 4)
     )
   }
 
+  // Handle keypad backspace
   const handleBackspace = () => {
     setAnswer((current) =>
       current.slice(0, -1)
     )
   }
 
+  // Handle math challenge answer submission
   const handleMathSubmit = () => {
     if (!challenge) {
       return
@@ -358,6 +355,7 @@ export default function ActiveAlarm({
     }
   }
 
+  // Handle typing challenge answer submission
   const handleTypingSubmit = () => {
     if (!challenge) {
       return

@@ -7,10 +7,12 @@ import BottomNav from './components/BottomNav'
 import './styles.css'
 
 export default function App() {
+  // Manage application navigation and active alarm state
   const [page, setPage] = useState('home')
   const [activeChallenge, setActiveChallenge] = useState('Math')
   const [editingAlarm, setEditingAlarm] = useState(null)
 
+  // Handle page navigation
   const handleNavigate = (nextPage) => {
     setPage(nextPage)
   }

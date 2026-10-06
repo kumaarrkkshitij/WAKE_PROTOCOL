@@ -8,6 +8,7 @@ import { deleteAlarmMusic } from '../utils/alarmMusic'
 
 const dayKeys = ['SU', 'M', 'T', 'W', 'TH', 'F', 'SA']
 
+// Calculate the next scheduled alarm
 function getNextAlarm(alarmList) {
   const now = new Date()
   const currentDay = now.getDay()
@@ -74,6 +75,7 @@ function getNextAlarm(alarmList) {
   return candidates[0] || null
 }
 
+// Format time remaining until next alarm
 function formatNextAlarm(minutesUntil) {
   if (minutesUntil === null) {
     return null
@@ -106,6 +108,7 @@ export default function ManageAlarms({ onCreate, onEdit }) {
   const [currentTime, setCurrentTime] =
     useState(new Date())
 
+  // Load alarms from the API
   useEffect(() => {
     listAlarms()
       .then((data) => {
@@ -126,6 +129,7 @@ export default function ManageAlarms({ onCreate, onEdit }) {
       })
   }, [])
 
+  // Update live clock every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date())
@@ -134,6 +138,7 @@ export default function ManageAlarms({ onCreate, onEdit }) {
     return () => clearInterval(timer)
   }, [])
 
+  // Toggle alarm enabled status
   const toggleAlarm = async (id) => {
     const alarm = alarms.find(
       (item) => item.id === id
@@ -183,6 +188,7 @@ export default function ManageAlarms({ onCreate, onEdit }) {
     }
   }
 
+  // Delete alarm and associated music
   const deleteAlarm = async (id) => {
     try {
       await deleteAlarmRequest(id)
@@ -202,6 +208,7 @@ export default function ManageAlarms({ onCreate, onEdit }) {
     }
   }
 
+  // Handle alarm filtering
   const filteredAlarms = alarms.filter(
     (alarm) => {
       if (filter === 'all') return true
@@ -239,6 +246,7 @@ export default function ManageAlarms({ onCreate, onEdit }) {
     }
   )
 
+  // Sort alarms by time
   const sortedAlarms = [
     ...filteredAlarms,
   ].sort((a, b) => {

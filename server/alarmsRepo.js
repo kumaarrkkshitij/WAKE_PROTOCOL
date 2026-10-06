@@ -1,3 +1,4 @@
+// Fetch all alarms from database
 export async function getAll(pool) {
   const result = await pool.query(
     'SELECT * FROM alarms ORDER BY created_at DESC'
@@ -5,6 +6,7 @@ export async function getAll(pool) {
   return result.rows
 }
 
+// Fetch alarm by ID from database
 export async function getById(pool, id) {
   const result = await pool.query(
     'SELECT * FROM alarms WHERE id = $1',
@@ -13,6 +15,7 @@ export async function getById(pool, id) {
   return result.rows[0] ?? null
 }
 
+// Insert a new alarm into database
 export async function create(
   pool,
   { time, period, name, repeat_days, challenge_type, music, enabled }
@@ -36,6 +39,7 @@ export async function create(
   return result.rows[0]
 }
 
+// Update alarm details in database
 export async function update(
   pool,
   id,
@@ -67,6 +71,7 @@ export async function update(
   return result.rows[0] ?? null
 }
 
+// Delete an alarm from database
 export async function remove(pool, id) {
   const result = await pool.query(
     'DELETE FROM alarms WHERE id = $1 RETURNING id',
