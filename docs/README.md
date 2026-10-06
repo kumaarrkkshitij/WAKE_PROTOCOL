@@ -627,7 +627,6 @@ WAKE_PROTOCOL/
 ├── AI-USAGE.md
 ├── LICENSE
 ├── README.md
-├── START-HERE.md
 └── compose.yml
 ```
 
@@ -716,17 +715,21 @@ Screenshots of the application are stored in the project assets/documentation.
 
 ![WAKE Protocol Manage Alarms Screen](assets/manage-alarms.png)
 
-### Create Alarm
+### Create & Edit Alarm
 
-![WAKE Protocol Create Alarm Screen](assets/create-alarm.png)
+![WAKE Protocol Create & Edit Alarm Screen](assets/create%3Aedit-alarm.png)
 
 ### Active Alarm — Math Mission
 
-![WAKE Protocol Math Mission](assets/%20active-math.png)
+![WAKE Protocol Math Mission](assets/active-math.png)
 
 ### Active Alarm — Typing Mission
 
 ![WAKE Protocol Typing Mission](assets/active-typing.png)
+
+### Presentation Banner Image
+
+![WAKE Protocol Presentation Banner](assets/Square%20image_WAKE%20PROTOCOL.png)
 
 ---
 

@@ -179,6 +179,18 @@ At least six entries. One per real use. Every entry needs a commit link.
 * **What I kept, what I changed, and why:** I reviewed and applied the suggested configuration changes, tested the application locally, fixed the local environment setup, configured the required GitHub repository variables, and verified the deployed application myself. I kept the existing application features and only changed the configuration and API connection code needed for local and production environments to work correctly.
 - **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/288384aed91c957e1d014fd0f8faf6ececc88a3d
 
+### 2026-10-06 - Consistency Tracker and Deployment Fix
+
+- **Tool:** ChatGPT
+
+- **What I asked for:** I used ChatGPT to help troubleshoot and fix the WAKE Protocol Home screen's **Consistency** tracker after the deployed application was showing incorrect completed days. I also used ChatGPT to identify why previous test data was affecting the tracker and to troubleshoot the resulting GitHub Pages deployment issue.
+
+- **What it gave back:** ChatGPT helped analyze the consistency-tracking logic in `Home.jsx` and the completion data stored by `ActiveAlarm.jsx`. It identified that the tracker was incorrectly treating days without scheduled alarms as completed and helped change the logic so that only actual completed alarm challenges count toward the consistency history. ChatGPT also helped identify that previous test data stored in `localStorage` could cause old completion states to remain visible and provided a one-time storage reset approach. During deployment, ChatGPT also helped identify and correct an incomplete `Home.jsx` file that had caused the GitHub Pages build to fail.
+
+- **What I kept, what I changed, and why:** I reviewed the suggested changes and applied the relevant fixes to `Home.jsx`. I kept the existing alarm scheduling, Home screen functionality, and Active Alarm completion system unchanged. I changed only the consistency-tracking logic and the necessary initialization of its stored data so that the tracker reflects actual completed alarm days. I also restored the complete Home page after the deployment build issue, rebuilt the project successfully, and prepared the corrected version for deployment.
+
+- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/d47c2019e91a48a7c1df84efbaf017c7dc6c7f70
+
 ## 2. Where the AI got it wrong
 
 Three cases. Be specific. If you write that the AI was never wrong, this section

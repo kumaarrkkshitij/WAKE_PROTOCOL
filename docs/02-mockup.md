@@ -79,7 +79,7 @@ The Create Alarm screen allows the user to configure and save a new alarm.
 
 The selected audio file is stored locally in the browser using IndexedDB. The audio itself is not uploaded to the backend.
 
-![WAKE Protocol Create Alarm screen](assets/create-alarm.png)
+![WAKE Protocol Create Alarm screen](assets/create%3Aedit-alarm.png)
 
 ---
 
@@ -106,7 +106,7 @@ The original wireframe showed Edit as a management action for an existing alarm.
 
 The Edit Alarm screen itself remains focused on changing the alarm's configuration rather than providing separate delete controls.
 
-![WAKE Protocol Edit Alarm screen](assets/create-alarm.png)
+![WAKE Protocol Edit Alarm screen](assets/create%3Aedit-alarm.png)
 
 ---
 
@@ -135,7 +135,9 @@ After successful completion, the alarm workflow finishes and the user returns to
 
 If the alarm music finishes before the required challenge is completed, the alarm is recorded as missed.
 
-![WAKE Protocol Active Alarm screen](assets/active-math.png)
+![WAKE Protocol Active Alarm Math Mission](assets/active-math.png)
+
+![WAKE Protocol Active Alarm Typing Mission](assets/active-typing.png)
 
 ---
 
@@ -154,7 +156,7 @@ The finalized application uses a compact phone layout with:
 * Blue accent elements
 * Clear alarm and challenge status indicators
 
-![WAKE Protocol mobile presentation](assets/home.png)
+![WAKE Protocol mobile presentation](assets/Square%20image_WAKE%20PROTOCOL.png)
 
 ---
 
@@ -251,11 +253,12 @@ The exported application screenshots are stored in the repository under:
 
 ```text
 docs/assets/
-├── home.png
-├── manage-alarms.png
-├── create-alarm.png
+├── Square image_WAKE PROTOCOL.png
 ├── active-math.png
-└── active-typing.png
+├── active-typing.png
+├── create:edit-alarm.png
+├── home.png
+└── manage-alarms.png
 ```
 
 The images above are referenced directly by this document using relative Markdown paths. Once the corresponding files are placed in `docs/assets/`, GitHub will automatically display them here without requiring any further changes to `02-mockup.md`.

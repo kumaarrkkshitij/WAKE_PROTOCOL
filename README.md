@@ -1,7 +1,6 @@
 # WAKE Protocol
 
 > WAKE Protocol is a responsive challenge-based alarm web application designed for students and people who struggle to wake up, requiring users to complete interactive cognitive disarm missions before an alarm can be dismissed.
-> [START-HERE.md](START-HERE.md).
 
 WAKE Protocol transforms the traditional alarm experience by combining automated scheduling, customizable repeat days, local audio disarm tracks, persistent PostgreSQL storage, and mental engagement challenges to ensure users are awake and alert before dismissing their alarms.
 
@@ -13,7 +12,7 @@ WAKE Protocol transforms the traditional alarm experience by combining automated
 
 > **Current development status:** Completed full-stack application. The React/Vite frontend communicates with an Express REST API backed by a PostgreSQL database, with full support for local fallback demo mode.
 
-![WAKE Protocol Home Screen](docs/assets/home.png)
+![WAKE Protocol](docs/assets/Square%20image_WAKE%20PROTOCOL.png)
 
 ---
 
@@ -313,14 +312,18 @@ WAKE_PROTOCOL/
 │
 ├── docs/                          # Documentation assets and screenshots
 │   └── assets/
-│       └── screenshot.png
+│       ├── Square image_WAKE PROTOCOL.png
+│       ├── active-math.png
+│       ├── active-typing.png
+│       ├── create:edit-alarm.png
+│       ├── home.png
+│       └── manage-alarms.png
 │
 ├── .env.example                   # Root environment variable template
 ├── .gitignore                     # Git ignore rules
 ├── AI-USAGE.md                    # Record of AI assistance and development usage
 ├── LICENSE                        # MIT License
 ├── README.md                      # Master project documentation
-├── START-HERE.md                  # Quickstart guide
 └── compose.yml                    # Docker Compose local stack setup
 ```
 
