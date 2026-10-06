@@ -13,6 +13,17 @@ function getLocalDateKey(date = new Date()) {
   return `${year}-${month}-${day}`
 }
 
+// Check whether an enabled alarm is scheduled for a specific date
+function hasScheduledAlarm(alarms, date) {
+  const dayKey = dayKeys[date.getDay()]
+
+  return alarms.some(
+    (alarm) =>
+      alarm.enabled &&
+      (alarm.repeat_days || []).includes(dayKey)
+  )
+}
+
 // Calculate streak and consistency metrics
 function getConsistencyData(alarms = []) {
   const stored =
@@ -20,31 +31,53 @@ function getConsistencyData(alarms = []) {
 
   const today = new Date()
 
+  // No enabled alarms means there is no consistency to track
+  const hasEnabledAlarms = alarms.some(
+    (alarm) => alarm.enabled
+  )
+
+  if (!hasEnabledAlarms) {
+    return {
+      currentStreak: 0,
+      personalBest: 0,
+      lastSevenDays: Array(7).fill(false),
+    }
+  }
+
+  // Check whether a specific date was successfully completed
+  const isCompletedDay = (date) => {
+    const dateKey = getLocalDateKey(date)
+
+    return (
+      hasScheduledAlarm(alarms, date) &&
+      stored[dateKey] === 'completed'
+    )
+  }
+
+  // Calculate current streak.
+  // Today must be completed for the current streak to begin.
   let currentStreak = 0
 
   for (let offset = 0; offset < 365; offset++) {
     const date = new Date(today)
     date.setDate(today.getDate() - offset)
 
-    const dateKey = getLocalDateKey(date)
-
-    const isCompleted =
-      stored[dateKey] === 'completed'
-
-    if (isCompleted) {
+    if (isCompletedDay(date)) {
       currentStreak++
     } else {
       break
     }
   }
 
+  // Calculate personal best from the stored completion history.
   let personalBest = 0
   let runningStreak = 0
 
-  const dates = Object.keys(stored).sort()
+  for (let offset = 364; offset >= 0; offset--) {
+    const date = new Date(today)
+    date.setDate(today.getDate() - offset)
 
-  for (const dateKey of dates) {
-    if (stored[dateKey] === 'completed') {
+    if (isCompletedDay(date)) {
       runningStreak++
       personalBest = Math.max(
         personalBest,
@@ -55,20 +88,20 @@ function getConsistencyData(alarms = []) {
     }
   }
 
-  // Show the most recent 7 days first.
-  // Today is the first bar.
+  // Display the most recent 7 days.
+  // First bar = today
+  // Second bar = yesterday
+  // Third bar = 2 days ago
+  // etc.
   const lastSevenDays = []
 
   for (let offset = 0; offset < 7; offset++) {
     const date = new Date(today)
     date.setDate(today.getDate() - offset)
 
-    const dateKey = getLocalDateKey(date)
-
-    const isCompleted =
-      stored[dateKey] === 'completed'
-
-    lastSevenDays.push(isCompleted)
+    lastSevenDays.push(
+      isCompletedDay(date)
+    )
   }
 
   return {
@@ -376,7 +409,8 @@ export default function Home({ onAlarmStart }) {
     onAlarmStart,
   ])
 
-  const nextAlarm = getNextAlarm(alarms)
+  const nextAlarm =
+    getNextAlarm(alarms)
 
   const targetSleep =
     getTargetSleep(nextAlarm)
