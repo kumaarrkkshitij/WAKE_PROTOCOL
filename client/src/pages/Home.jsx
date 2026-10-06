@@ -27,19 +27,11 @@ function getConsistencyData(alarms = []) {
     date.setDate(today.getDate() - offset)
 
     const dateKey = getLocalDateKey(date)
-    const dayKey = dayKeys[date.getDay()]
 
-    const hasEnabledAlarm = alarms.some(
-      (alarm) =>
-        alarm.enabled &&
-        (alarm.repeat_days || []).includes(dayKey)
-    )
+    const isCompleted =
+      stored[dateKey] === 'completed'
 
-    const isLit =
-      stored[dateKey] === 'completed' ||
-      (!stored[dateKey] && !hasEnabledAlarm)
-
-    if (isLit) {
+    if (isCompleted) {
       currentStreak++
     } else {
       break
@@ -54,32 +46,29 @@ function getConsistencyData(alarms = []) {
   for (const dateKey of dates) {
     if (stored[dateKey] === 'completed') {
       runningStreak++
-      personalBest = Math.max(personalBest, runningStreak)
+      personalBest = Math.max(
+        personalBest,
+        runningStreak
+      )
     } else {
       runningStreak = 0
     }
   }
 
+  // Show the most recent 7 days first.
+  // Today is the first bar.
   const lastSevenDays = []
 
-  for (let offset = 6; offset >= 0; offset--) {
+  for (let offset = 0; offset < 7; offset++) {
     const date = new Date(today)
     date.setDate(today.getDate() - offset)
 
     const dateKey = getLocalDateKey(date)
-    const dayKey = dayKeys[date.getDay()]
 
-    const hasEnabledAlarm = alarms.some(
-      (alarm) =>
-        alarm.enabled &&
-        (alarm.repeat_days || []).includes(dayKey)
-    )
+    const isCompleted =
+      stored[dateKey] === 'completed'
 
-    const isLit =
-      stored[dateKey] === 'completed' ||
-      (!stored[dateKey] && !hasEnabledAlarm)
-
-    lastSevenDays.push(isLit)
+    lastSevenDays.push(isCompleted)
   }
 
   return {
@@ -112,9 +101,11 @@ function getNextAlarm(alarmList) {
         hour24 = hours === 12 ? 12 : hours + 12
       }
 
-      const alarmMinutes = hour24 * 60 + minutes
+      const alarmMinutes =
+        hour24 * 60 + minutes
 
-      const repeatDays = alarm.repeat_days || []
+      const repeatDays =
+        alarm.repeat_days || []
 
       for (let offset = 0; offset < 7; offset++) {
         const targetDay =
@@ -167,7 +158,8 @@ function getTargetSleep(nextAlarm) {
   if (nextAlarm.alarm.period === 'AM') {
     hour24 = hours === 12 ? 0 : hours
   } else {
-    hour24 = hours === 12 ? 12 : hours + 12
+    hour24 =
+      hours === 12 ? 12 : hours + 12
   }
 
   const sleepMinutes =
@@ -241,7 +233,9 @@ export default function Home({ onAlarmStart }) {
     listAlarms()
       .then((data) => {
         setAlarms(data)
-        setConsistency(getConsistencyData(data))
+        setConsistency(
+          getConsistencyData(data)
+        )
       })
       .catch((error) => {
         console.error(
@@ -266,7 +260,9 @@ export default function Home({ onAlarmStart }) {
   // Sync consistency state on storage update
   useEffect(() => {
     const updateConsistency = () => {
-      setConsistency(getConsistencyData(alarms))
+      setConsistency(
+        getConsistencyData(alarms)
+      )
     }
 
     window.addEventListener(
@@ -303,9 +299,14 @@ export default function Home({ onAlarmStart }) {
       alarms,
     })
 
-    const currentDay = currentTime.getDay()
-    const currentHour = currentTime.getHours()
-    const currentMinute = currentTime.getMinutes()
+    const currentDay =
+      currentTime.getDay()
+
+    const currentHour =
+      currentTime.getHours()
+
+    const currentMinute =
+      currentTime.getMinutes()
 
     alarms
       .filter((alarm) => alarm.enabled)
@@ -316,7 +317,8 @@ export default function Home({ onAlarmStart }) {
         let hour24 = hours
 
         if (alarm.period === 'AM') {
-          hour24 = hours === 12 ? 0 : hours
+          hour24 =
+            hours === 12 ? 0 : hours
         } else {
           hour24 =
             hours === 12 ? 12 : hours + 12
@@ -375,6 +377,7 @@ export default function Home({ onAlarmStart }) {
   ])
 
   const nextAlarm = getNextAlarm(alarms)
+
   const targetSleep =
     getTargetSleep(nextAlarm)
 
@@ -427,7 +430,9 @@ export default function Home({ onAlarmStart }) {
             className="alarm-hero"
             onClick={() =>
               nextAlarm &&
-              onAlarmStart?.(nextAlarm.alarm)
+              onAlarmStart?.(
+                nextAlarm.alarm
+              )
             }
           >
             <div className="ambient-glow glow-top" />
@@ -495,6 +500,7 @@ export default function Home({ onAlarmStart }) {
           <section className="stat-card">
             <div className="stat-header">
               <span>CONSISTENCY</span>
+
               <span className="stat-icon">
                 🔥
               </span>
@@ -505,7 +511,9 @@ export default function Home({ onAlarmStart }) {
                 {consistency.currentStreak}
               </strong>
 
-              <span>days</span>
+              <span>
+                days
+              </span>
             </div>
 
             <div className="streak-bars">
@@ -546,7 +554,9 @@ export default function Home({ onAlarmStart }) {
             <div className="sleep-main">
               <div>
                 <div className="target-sleep">
-                  <span>Target Sleep:</span>
+                  <span>
+                    Target Sleep:
+                  </span>
 
                   {targetSleep ? (
                     <>
