@@ -13,7 +13,7 @@ WAKE Protocol transforms the traditional alarm experience by combining automated
 > **Current development status:** Completed full-stack application. The React/Vite frontend communicates with an Express REST API backed by a PostgreSQL database, with full support for local fallback demo mode.
 
 <p align="center">
-  <img src="docs/assets/Square%20image_WAKE%20PROTOCOL.png" alt="WAKE Protocol Banner" width="580"/>
+  <img src="docs/assets/Square%20image_WAKE%20PROTOCOL.png" alt="WAKE Protocol Banner" width="650"/>
 </p>
 
 ---
