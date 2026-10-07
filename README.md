@@ -12,7 +12,9 @@ WAKE Protocol transforms the traditional alarm experience by combining automated
 
 > **Current development status:** Completed full-stack application. The React/Vite frontend communicates with an Express REST API backed by a PostgreSQL database, with full support for local fallback demo mode.
 
-![WAKE Protocol](docs/assets/Square%20image_WAKE%20PROTOCOL.png)
+<p align="center">
+  <img src="docs/assets/Square%20image_WAKE%20PROTOCOL.png" alt="WAKE Protocol Banner" width="450"/>
+</p>
 
 ---
 
@@ -294,6 +296,7 @@ WAKE_PROTOCOL/
 │   │   ├── App.jsx                # Main layout and view state management
 │   │   ├── main.jsx               # React DOM entrypoint
 │   │   └── styles.css             # Stark Protocol design system stylesheet
+│   ├── .env.example               # Client environment variable template
 │   ├── index.html                 # Main HTML page entrypoint
 │   ├── package.json               # Client dependencies (React 18, Vite 6)
 │   └── vite.config.js             # Vite build configuration
@@ -304,6 +307,7 @@ WAKE_PROTOCOL/
 │   │   ├── run.js                 # Script to execute database queries
 │   │   ├── schema.sql             # SQL schema definition for alarms table
 │   │   └── seed.sql               # Initial database seed records
+│   ├── .env.example               # Server environment variable template
 │   ├── alarmsRepo.js              # Repository pattern database queries (parameterized SQL)
 │   ├── challenges.js              # 400 Math and 400 Typing challenge dataset pools
 │   ├── server.js                  # Express API routes, CORS, validation, health checks

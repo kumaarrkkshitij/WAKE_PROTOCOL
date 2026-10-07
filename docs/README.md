@@ -603,7 +603,8 @@ WAKE_PROTOCOL/
 │   │   └── styles.css
 │   │
 │   ├── vite.config.js
-│   └── package.json
+│   ├── package.json
+│   └── .env.example
 │
 ├── server/
 │   ├── db/
@@ -707,29 +708,45 @@ Defines the PostgreSQL database structure.
 
 Screenshots of the application are stored in the project assets/documentation.
 
-### Home
+### Home Dashboard & Manage Alarms
 
-![WAKE Protocol Home Screen](assets/home.png)
+<table width="100%">
+  <tr>
+    <td align="center" width="50%">
+      <b>Home Dashboard</b><br/><br/>
+      <img src="assets/home.png" alt="WAKE Protocol Home Screen" width="320"/>
+    </td>
+    <td align="center" width="50%">
+      <b>Manage Alarms</b><br/><br/>
+      <img src="assets/manage-alarms.png" alt="WAKE Protocol Manage Alarms Screen" width="320"/>
+    </td>
+  </tr>
+</table>
 
-### Manage Alarms
+### Create & Edit Alarm, Active Math & Typing Missions
 
-![WAKE Protocol Manage Alarms Screen](assets/manage-alarms.png)
+<table width="100%">
+  <tr>
+    <td align="center" width="33%">
+      <b>Create & Edit Alarm</b><br/><br/>
+      <img src="assets/create%3Aedit-alarm.png" alt="WAKE Protocol Create & Edit Alarm Screen" width="280"/>
+    </td>
+    <td align="center" width="33%">
+      <b>Active Alarm — Math</b><br/><br/>
+      <img src="assets/active-math.png" alt="WAKE Protocol Math Mission" width="280"/>
+    </td>
+    <td align="center" width="34%">
+      <b>Active Alarm — Typing</b><br/><br/>
+      <img src="assets/active-typing.png" alt="WAKE Protocol Typing Mission" width="280"/>
+    </td>
+  </tr>
+</table>
 
-### Create & Edit Alarm
+### Presentation Banner
 
-![WAKE Protocol Create & Edit Alarm Screen](assets/create%3Aedit-alarm.png)
-
-### Active Alarm — Math Mission
-
-![WAKE Protocol Math Mission](assets/active-math.png)
-
-### Active Alarm — Typing Mission
-
-![WAKE Protocol Typing Mission](assets/active-typing.png)
-
-### Presentation Banner Image
-
-![WAKE Protocol Presentation Banner](assets/Square%20image_WAKE%20PROTOCOL.png)
+<p align="center">
+  <img src="assets/Square%20image_WAKE%20PROTOCOL.png" alt="WAKE Protocol Presentation Banner" width="400"/>
+</p>
 
 ---
 
