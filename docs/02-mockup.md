@@ -59,68 +59,34 @@ The Create Alarm action remains available from the Manage Alarms screen.
 
 When no alarms have been created, Manage Alarms displays an empty state instead of an alarm list. The user is provided with a clear way to create their first alarm.
 
-<p align="center">
-  <img src="assets/manage-alarms.png" alt="WAKE Protocol Manage Alarms empty state" width="340"/>
-</p>
-
 ---
 
-## 3. Create Alarm
+## 3. Create & Edit Alarm
 
-The Create Alarm screen allows the user to configure and save a new alarm.
+The Create and Edit Alarm screens allow the user to configure a new alarm or modify an existing one using the same core configuration options.
 
 ### Final UI includes
 
 * Alarm name
-* Alarm time
-* AM/PM period
-* Repeat-day selection
-* Local music file selection
-* Challenge type selection
+* Alarm time and AM/PM period
+* Repeat-day selection (`M`, `T`, `W`, `TH`, `F`, `SA`, `SU`)
+* Local music file selection (stored in browser IndexedDB)
+* Challenge type selection (Math or Typing)
+* Save and Cancel/Back navigation actions
 
-  * Math
-  * Typing
-* Save alarm action
-* Cancel/back navigation
-
-The selected audio file is stored locally in the browser using IndexedDB. The audio itself is not uploaded to the backend.
-
-<p align="center">
-  <img src="assets/create%3Aedit-alarm.png" alt="WAKE Protocol Create Alarm screen" width="340"/>
-</p>
-
----
-
-## 4. Edit Alarm
-
-The Edit Alarm screen allows the user to modify an existing alarm using the same core configuration options available when creating an alarm.
-
-### Final UI includes
-
-* Existing alarm name
-* Existing alarm time
-* Existing AM/PM period
-* Existing repeat days
-* Existing music selection
-* Existing challenge type
-* Save changes action
-* Cancel/back navigation
-
-Changes are persisted through the backend API and PostgreSQL database.
+Changes to existing alarms are persisted through the backend API and PostgreSQL database.
 
 ### Interface refinements
 
-The original wireframe showed Edit as a management action for an existing alarm. In the final UI, the user accesses Edit by selecting the **pencil icon directly on the corresponding alarm card** in Manage Alarms.
-
-The Edit Alarm screen itself remains focused on changing the alarm's configuration rather than providing separate delete controls.
+The original wireframe showed Edit as a separate management action. In the final UI, the user accesses Edit by selecting the **pencil icon directly on the corresponding alarm card** in Manage Alarms.
 
 <p align="center">
-  <img src="assets/create%3Aedit-alarm.png" alt="WAKE Protocol Edit Alarm screen" width="340"/>
+  <img src="assets/create%3Aedit-alarm.png" alt="WAKE Protocol Create & Edit Alarm screen" width="340"/>
 </p>
 
 ---
 
-## 5. Active Alarm / Challenge
+## 4. Active Alarm / Challenge
 
 The Active Alarm / Challenge screen appears automatically when a scheduled alarm reaches its configured time.
 
@@ -145,7 +111,7 @@ After successful completion, the alarm workflow finishes and the user returns to
 
 If the alarm music finishes before the required challenge is completed, the alarm is recorded as missed.
 
-<table width="100%">
+<table align="center" width="100%">
   <tr>
     <td align="center" width="50%">
       <b>Math Mission</b><br/><br/>
@@ -160,7 +126,7 @@ If the alarm music finishes before the required challenge is completed, the alar
 
 ---
 
-## 6. Mobile Presentation
+## 5. Mobile Presentation
 
 WAKE Protocol is a responsive web application designed around a mobile-first interface.
 
@@ -176,12 +142,12 @@ The finalized application uses a compact phone layout with:
 * Clear alarm and challenge status indicators
 
 <p align="center">
-  <img src="assets/Square%20image_WAKE%20PROTOCOL.png" alt="WAKE Protocol mobile presentation" width="380"/>
+  <img src="assets/Square%20image_WAKE%20PROTOCOL.png" alt="WAKE Protocol mobile presentation" width="580"/>
 </p>
 
 ---
 
-## 7. Visual Design
+## 6. Visual Design
 
 The finalized mockup uses the visual design implemented throughout WAKE Protocol.
 
@@ -201,17 +167,16 @@ The mockup uses real application content rather than placeholder text.
 
 ---
 
-## 8. Feature Refinements from the Original Wireframes
+## 7. Feature Refinements from the Original Wireframes
 
-The original M6A2 wireframes established the five main screens:
+The original M6A2 wireframes established the main screen functions:
 
 1. Home
 2. Manage Alarms
-3. Create Alarm
-4. Edit Alarm
-5. Active Alarm / Challenge
+3. Create & Edit Alarm
+4. Active Alarm / Challenge
 
-All five screens remain in the finalized application.
+All core screens remain present in the finalized application.
 
 The implementation introduced several UI refinements while keeping the original functionality intact:
 
@@ -230,7 +195,7 @@ These changes are UI and implementation refinements rather than removal of the o
 
 ---
 
-## 9. Screen and Feature Coverage
+## 8. Screen and Feature Coverage
 
 | Original Wireframe Feature                    | Final Implementation           |
 | --------------------------------------------- | ------------------------------ |
@@ -258,17 +223,17 @@ These changes are UI and implementation refinements rather than removal of the o
 
 ---
 
-## 10. Mockup-to-Implementation Check
+## 9. Mockup-to-Implementation Check
 
 The mockup represents the finalized application rather than an earlier proposed design.
 
-The five original screens remain present, while the interface has been refined during implementation to improve usability, especially on mobile devices.
+The core screens remain present, while the interface has been refined during implementation to improve usability, especially on mobile devices.
 
 The mockup therefore reflects the application that was actually built and deployed rather than a separate redesign that differs from the final product.
 
 ---
 
-## 11. Assets
+## 10. Assets
 
 The exported application screenshots are stored in the repository under:
 
@@ -282,15 +247,15 @@ docs/assets/
 └── manage-alarms.png
 ```
 
-The images above are referenced directly by this document using relative Markdown paths. Once the corresponding files are placed in `docs/assets/`, GitHub will automatically display them here without requiring any further changes to `02-mockup.md`.
+The images above are referenced directly by this document using relative Markdown paths.
 
 ---
 
-## 12. Notes on the Final Mockup
+## 11. Notes on the Final Mockup
 
 The finalized mockup preserves the main user flow established in the original wireframes:
 
-**Home → Create Alarm → Manage Alarms → Edit Alarm → Active Alarm / Challenge → Home**
+**Home → Create & Edit Alarm → Manage Alarms → Active Alarm / Challenge → Home**
 
 The core functionality remains consistent with the approved wireframes. The differences are primarily visual and interaction refinements made during implementation to provide a cleaner and more practical mobile interface.
 

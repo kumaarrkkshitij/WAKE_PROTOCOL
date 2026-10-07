@@ -745,7 +745,7 @@ Screenshots of the application are stored in the project assets/documentation.
 ### Presentation Banner
 
 <p align="center">
-  <img src="assets/Square%20image_WAKE%20PROTOCOL.png" alt="WAKE Protocol Presentation Banner" width="400"/>
+  <img src="assets/Square%20image_WAKE%20PROTOCOL.png" alt="WAKE Protocol Presentation Banner" width="580"/>
 </p>
 
 ---

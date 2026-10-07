@@ -1,13 +1,37 @@
+/* ==========================================================================
+   WAKE PROTOCOL DESIGN SYSTEM (docs/03-design_system.pdf)
+   Style Approach: Plain CSS with CSS Custom Properties
+   ========================================================================== */
+
 :root {
+  /* --- STEP B: COLOR TOKENS --- */
+  /* Links, buttons, active states (PDF Token: --color-primary #00F0FF) */
   --primary: #00f0ff;
+  
+  /* Highlights & important actions (PDF Token: --color-accent #38BDF8) */
   --accent: #38bdf8;
+  
+  /* Bright cyan highlights & accent borders (PDF Token: --color-surface / highlight #00D2FF) */
   --highlight: #00d2ff;
+  
+  /* Main page background (PDF Token: --color-bg #070B14) */
   --bg: #070b14;
+  
+  /* Cards, panels, and containers (PDF Token: --color-surface #0F1523 / #151D2F) */
   --surface: #0f1523;
   --surface-high: #151d2f;
+  
+  /* Main body text and headings (PDF Token: --color-text #FFFFFF) */
   --text: #fff;
+  
+  /* Muted text & border lines */
   --muted: #8aa3be;
   --border: #1c2b42;
+
+  /* --- STEP D: SPACING RULE TOKENS --- */
+  /* Base unit: 8px (PDF Step D). Multiples of 8px used across gaps, margins & paddings */
+  --space-1: 8px;  /* Tight spacing between related items (PDF: 8px) */
+  --space-4: 32px; /* Standard section spacing (PDF: 32px) */
 }
 
 * {
@@ -21,10 +45,14 @@ body,
   min-height: 100%;
 }
 
+/* --- STEP C: TYPE SCALE & TYPOGRAPHY --- */
+/* Font Family: Trebuchet MS, sans-serif (PDF Step C) */
+/* Type Scale: Heading (20px Bold), Body (14px Regular), Small (11px Regular) */
 body {
   background: #02040a;
   color: var(--text);
   font-family: "Trebuchet MS", Arial, sans-serif;
+  font-size: 14px; /* Body scale: 14px Regular (PDF Step C) */
 }
 
 button,
@@ -46,8 +74,9 @@ button {
   background: var(--bg);
 }
 
-/* DESKTOP = PHONE PREVIEW */
-
+/* --- STEP F: RESPONSIVE PLAN --- */
+/* Breakpoint: 640px (PDF Step F) */
+/* Desktop (>640px): Phone preview container (390px x 844px) with 24px screen edge padding */
 @media (min-width: 641px) {
   html,
   body,
@@ -61,7 +90,7 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 24px;
+    padding: 24px; /* Screen edge padding: 24px (PDF Step D) */
     overflow: hidden;
   }
 
@@ -127,8 +156,7 @@ button {
   }
 }
 
-/* PHONE */
-
+/* Phone (<=640px): Single column stack fitting 375px viewport with no horizontal scroll (PDF Step F) */
 @media (max-width: 640px) {
   html,
   body,
@@ -272,13 +300,15 @@ button {
 
 /* HERO */
 
+/* --- STEP E: REUSABLE COMPONENTS - AlarmCard & AlarmInfo (Molecules) --- */
+/* Cards, panels, and containers styled using --color-surface (#0F1523) (PDF Step B & E) */
 .alarm-hero {
   position: relative;
   overflow: hidden;
   padding: 20px;
   border: 1px solid rgba(0, 240, 255, 0.3);
   border-radius: 12px;
-  background: var(--surface);
+  background: var(--surface); /* --color-surface token */
 }
 
 .ambient-glow {
@@ -598,6 +628,8 @@ button {
   font-size: 18px;
 }
 
+/* --- STEP E: REUSABLE COMPONENTS - Button (Atom) --- */
+/* Primary action button variant using --color-primary (#00F0FF) (PDF Step B & E) */
 .new-alarm-button {
   padding: 9px 12px;
   border: 1px solid var(--primary);
@@ -643,11 +675,13 @@ button {
   gap: 14px;
 }
 
+/* --- STEP E: REUSABLE COMPONENTS - AlarmCard (Molecule) --- */
+/* Appears on Home & Manage Alarms (PDF Step E) */
 .manage-alarm-card {
   padding: 16px;
   border: 1px solid rgba(0, 240, 255, 0.25);
   border-radius: 12px;
-  background: var(--surface);
+  background: var(--surface); /* --color-surface token */
 }
 
 .manage-alarm-card.inactive {
@@ -690,6 +724,8 @@ button {
   font-size: 10px;
 }
 
+/* --- STEP E: REUSABLE COMPONENTS - AlarmStatusToggle (Molecule) --- */
+/* Appears on Manage Alarms & Edit Alarm; toggles alarm enabled state (PDF Step E) */
 .alarm-toggle {
   width: 52px;
   height: 30px;
@@ -779,6 +815,8 @@ button {
   font-size: 9px;
 }
 
+/* --- STEP E: REUSABLE COMPONENTS - AlarmActions (Molecule) --- */
+/* Appears on Manage Alarms & Home; provides onEdit & onDelete actions (PDF Step E) */
 .alarm-actions {
   display: flex;
   gap: 6px;
@@ -917,6 +955,8 @@ button {
   cursor: pointer;
 }
 
+/* --- STEP E: REUSABLE COMPONENTS - Button (Atom) --- */
+/* Primary save & cancel action button variants (PDF Step E) */
 .cancel-button {
   padding: 8px 14px;
   border: 1px solid var(--border);
