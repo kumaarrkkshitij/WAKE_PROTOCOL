@@ -181,15 +181,19 @@ At least six entries. One per real use. Every entry needs a commit link.
 
 ### 2026-10-06 - Consistency Tracker and Deployment Fix
 
-- **Tool:** ChatGPT
+* **Tool:** ChatGPT
+* **What I asked for:** I used ChatGPT to help troubleshoot and fix the WAKE Protocol Home screen's **Consistency** tracker after the deployed application was showing incorrect completed days. I also used ChatGPT to identify why previous test data was affecting the tracker and to troubleshoot the resulting GitHub Pages deployment issue.
+* **What it gave back:** ChatGPT helped analyze the consistency-tracking logic in `Home.jsx` and the completion data stored by `ActiveAlarm.jsx`. It identified that the tracker was incorrectly treating days without scheduled alarms as completed and helped change the logic so that only actual completed alarm challenges count toward the consistency history. ChatGPT also helped identify that previous test data stored in `localStorage` could cause old completion states to remain visible and provided a one-time storage reset approach. During deployment, ChatGPT also helped identify and correct an incomplete `Home.jsx` file that had caused the GitHub Pages build to fail.
+* **What I kept, what I changed, and why:** I reviewed the suggested changes and applied the relevant fixes to `Home.jsx`. I kept the existing alarm scheduling, Home screen functionality, and Active Alarm completion system unchanged. I changed only the consistency-tracking logic and the necessary initialization of its stored data so that the tracker reflects actual completed alarm days. I also restored the complete Home page after the deployment build issue, rebuilt the project successfully, and prepared the corrected version for deployment.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/d47c2019e91a48a7c1df84efbaf017c7dc6c7f70
 
-- **What I asked for:** I used ChatGPT to help troubleshoot and fix the WAKE Protocol Home screen's **Consistency** tracker after the deployed application was showing incorrect completed days. I also used ChatGPT to identify why previous test data was affecting the tracker and to troubleshoot the resulting GitHub Pages deployment issue.
+### 2026-10-07 - Final Code and Documentation Polishing
 
-- **What it gave back:** ChatGPT helped analyze the consistency-tracking logic in `Home.jsx` and the completion data stored by `ActiveAlarm.jsx`. It identified that the tracker was incorrectly treating days without scheduled alarms as completed and helped change the logic so that only actual completed alarm challenges count toward the consistency history. ChatGPT also helped identify that previous test data stored in `localStorage` could cause old completion states to remain visible and provided a one-time storage reset approach. During deployment, ChatGPT also helped identify and correct an incomplete `Home.jsx` file that had caused the GitHub Pages build to fail.
-
-- **What I kept, what I changed, and why:** I reviewed the suggested changes and applied the relevant fixes to `Home.jsx`. I kept the existing alarm scheduling, Home screen functionality, and Active Alarm completion system unchanged. I changed only the consistency-tracking logic and the necessary initialization of its stored data so that the tracker reflects actual completed alarm days. I also restored the complete Home page after the deployment build issue, rebuilt the project successfully, and prepared the corrected version for deployment.
-
-- **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/d47c2019e91a48a7c1df84efbaf017c7dc6c7f70
+* **Tool:** Antigravity IDE
+* **What I asked for:** I used Antigravity IDE to help polish the WAKE Protocol code and update the project's final documentation and presentation materials before submission.
+* **What it gave back:** Antigravity IDE helped review and polish the existing code and documentation, including final project files, mockup documentation, weekly reports, security documentation, and presentation assets.
+* **What I kept, what I changed, and why:** I reviewed the suggested changes and applied the necessary polishing and documentation updates while keeping the existing application functionality unchanged. The changes were made to improve the final project's consistency, presentation, and submission readiness.
+* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/4c03940f37d7e8f2ef23ac7cd94d0553c03bfa37
 
 ## 2. Where the AI got it wrong
 
@@ -312,12 +316,6 @@ it in your own words.
 * **File:** `client/src/pages/AlarmForm.jsx`
 * **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/dd12f2b013da0b48f3c4489b0b65e5f63d00ab1b
 * **What it does and why it is built this way:** I worked on the alarm name part of the Create/Edit Alarm form. I added the alarm name to the form state and connected the input field so the entered name became part of the alarm data. Since the same AlarmForm component is used for both creating and editing alarms, keeping the alarm name in the shared form allows the same field to work for both operations.
-
-#### Edit Alarm State
-
-* **File:** `client/src/App.jsx`
-* **Commit:** https://github.com/kumaarrkkshitij/WAKE_PROTOCOL/commit/dd12f2b013da0b48f3c4489b0b65e5f63d00ab1b
-* **What it does and why it is built this way:** I worked on the `editingAlarm` state used when an existing alarm is selected for editing. The selected alarm is stored before navigating to the Edit Alarm screen, and then it is passed to `AlarmForm` through the `alarm` prop. I worked on this because the same `AlarmForm` component is used for both creating and editing an alarm, so the edit version needs to receive the selected alarm's existing data.
 
 #### Partial Express API Changes
 
