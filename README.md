@@ -377,6 +377,7 @@ WAKE_PROTOCOL/
 - **Expanded Disarm Mission Types:** Introduce pattern memory, reaction timing, logic puzzles, or physical movement/QR-code scanning challenges.
 - **Web Push Notifications & PWA Support:** Implement Progressive Web App service workers and browser notifications for background alarm execution.
 - **Advanced Wake-up Analytics:** Provide weekly/monthly reports on average completion time, streak consistency, and disarm challenge success rates.
+- **Native Mobile App:** Develop WAKE Protocol as a dedicated Android/iOS application with reliable background alarm execution, native notifications, and device-level audio support.
 
 ---
 
